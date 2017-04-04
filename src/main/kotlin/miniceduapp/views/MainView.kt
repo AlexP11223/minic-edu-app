@@ -10,6 +10,7 @@ class MainView : View("") {
     val controller: MainController by inject()
 
     var inputField: TextArea by singleAssign()
+    var outputField: TextArea by singleAssign()
 
     override val root = borderpane {
         addClass(Styles.mainScreen)
@@ -48,6 +49,14 @@ class MainView : View("") {
 
                 }
 
+            }
+        }
+        bottom {
+            vbox {
+                label("Output")
+                outputField = textarea {
+                    maxHeight = 100.0
+                }
             }
         }
     }
