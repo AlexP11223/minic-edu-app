@@ -4,12 +4,18 @@ import javafx.event.EventTarget
 import javafx.scene.control.TextArea
 import miniceduapp.Styles
 import miniceduapp.controllers.MainController
+import org.fxmisc.flowless.VirtualizedScrollPane
+import org.fxmisc.richtext.CodeArea
+import org.fxmisc.richtext.LineNumberFactory
+import org.fxmisc.richtext.model.StyleSpans
+import org.fxmisc.richtext.model.StyleSpansBuilder
 import tornadofx.*
+import java.util.regex.Pattern
 
 class MainView : View("") {
     val controller: MainController by inject()
 
-    var inputField: TextArea by singleAssign()
+    var inputField: CodeArea by singleAssign()
     var outputField: TextArea by singleAssign()
 
     override val root = borderpane {
@@ -40,13 +46,31 @@ class MainView : View("") {
                 arrowLabel()
                 button("Bytecode")
                 arrowLabel()
-                button("Execute")
+                button("Execute") {
+                    setOnAction {
+                        inputField.scene.stylesheets.add("https://gist.githubusercontent.com/AlexP11223/32bf908cfec37b93ca60f126dbb28992/raw/4194ea1a44bdd4b9970b1596d65c76aa36dc596f/1.css")
+                    }
+                }
             }
         }
         center {
             hbox {
-                inputField = textarea {
+                stackpane {
+                    inputField = codeEditor {
+                        minWidth = 500.0
+                        minHeight = 300.0
+                        richChanges()
+                                .filter { ch -> ch.inserted != ch.removed}
+                                .subscribe {
+                            setStyleSpans(0, computeHighlighting(text))
+                        }
+                        replaceText("""println("Hello");
+int x = 42;
+int y = x + 6 * 2 / (3 - 1);
+print("x: " + toString(y));
+""")
 
+                    }
                 }
 
             }
@@ -63,6 +87,64 @@ class MainView : View("") {
 
     fun EventTarget.arrowLabel() = label(" ➔ ") {
         addClass(Styles.arrowLabel)
+    }
+
+    fun EventTarget.codeEditor(op: (CodeArea.() -> Unit)? = null): CodeArea {
+        val codeArea = CodeArea()
+        codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
+
+        return opcr(this, codeArea, op);
+    }
+
+    private fun computeHighlighting(text: String): StyleSpans<Collection<String>> {
+        val matcher = PATTERN.matcher(text)
+        var lastKwEnd = 0
+        val spansBuilder = StyleSpansBuilder<Collection<String>>()
+        while (matcher.find()) {
+            val styleClass = (if (matcher.group("KEYWORD") != null)
+                Styles.keyword.name
+            else if (matcher.group("PAREN") != null)
+                "paren"
+            else if (matcher.group("BRACE") != null)
+                "brace"
+            else if (matcher.group("BRACKET") != null)
+                "bracket"
+            else if (matcher.group("SEMICOLON") != null)
+                "semicolon"
+            else if (matcher.group("STRING") != null)
+                "string"
+            else if (matcher.group("COMMENT") != null)
+                "comment"
+            else
+                null)!! /* never happens */
+            spansBuilder.add(emptyList<String>(), matcher.start() - lastKwEnd)
+            spansBuilder.add(setOf(styleClass), matcher.end() - matcher.start())
+            lastKwEnd = matcher.end()
+        }
+        spansBuilder.add(emptyList<String>(), text.length - lastKwEnd)
+        return spansBuilder.create()
+    }
+
+    companion object {
+        private val KEYWORDS = arrayOf("boolean", "break", "continue", "while", "double", "else", "if", "int")
+
+        private val KEYWORD_PATTERN = "\\b(" + KEYWORDS.joinToString("|") + ")\\b"
+        private val PAREN_PATTERN = "\\(|\\)"
+        private val BRACE_PATTERN = "\\{|\\}"
+        private val BRACKET_PATTERN = "\\[|\\]"
+        private val SEMICOLON_PATTERN = "\\;"
+        private val STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\""
+        private val COMMENT_PATTERN = "//[^\n]*" + "|" + "/\\*(.|\\R)*?\\*/"
+
+        private val PATTERN = Pattern.compile(
+                "(?<KEYWORD>" + KEYWORD_PATTERN + ")"
+                        + "|(?<PAREN>" + PAREN_PATTERN + ")"
+                        + "|(?<BRACE>" + BRACE_PATTERN + ")"
+                        + "|(?<BRACKET>" + BRACKET_PATTERN + ")"
+                        + "|(?<SEMICOLON>" + SEMICOLON_PATTERN + ")"
+                        + "|(?<STRING>" + STRING_PATTERN + ")"
+                        + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
+        )
     }
 }
 

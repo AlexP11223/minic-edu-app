@@ -7,6 +7,8 @@ class Styles : Stylesheet() {
     companion object {
         val mainScreen by cssclass()
         val arrowLabel by cssclass()
+
+        val keyword by cssclass()
     }
 
     init {
@@ -15,6 +17,10 @@ class Styles : Stylesheet() {
         }
         arrowLabel {
             fontSize = 1.6.em
+            fontWeight = FontWeight.BOLD
+        }
+
+        keyword {
             fontWeight = FontWeight.BOLD
         }
     }

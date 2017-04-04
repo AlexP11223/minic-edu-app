@@ -36,9 +36,15 @@
         <dependency>
             <groupId>com.github.alexp11223</groupId>
             <artifactId>minic</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.fxmisc.richtext</groupId>
+            <artifactId>richtextfx</artifactId>
+            <version>0.7-M3</version>
+        </dependency>
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
