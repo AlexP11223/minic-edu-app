@@ -4,7 +4,6 @@ import javafx.event.EventTarget
 import javafx.scene.control.TextArea
 import miniceduapp.Styles
 import miniceduapp.controllers.MainController
-import org.fxmisc.flowless.VirtualizedScrollPane
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import org.fxmisc.richtext.model.StyleSpans
@@ -24,7 +23,9 @@ class MainView : View("") {
             hbox {
                 button("Tokens") {
                     setOnAction {
-                        find<AstView>().openModal()
+                        controller.text = inputField.text
+                        find<TokensView>().openWindow()
+                        find<TokensView>().show()
                     }
                 }
                 arrowLabel()
