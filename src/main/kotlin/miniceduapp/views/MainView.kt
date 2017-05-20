@@ -2,8 +2,9 @@ package miniceduapp.views
 
 import javafx.event.EventTarget
 import javafx.scene.control.TextArea
-import miniceduapp.Styles
+import miniceduapp.views.styles.Styles
 import miniceduapp.controllers.MainController
+import miniceduapp.views.styles.CodeHighlightStyles
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import org.fxmisc.richtext.model.StyleSpans
@@ -49,7 +50,6 @@ class MainView : View("") {
                 arrowLabel()
                 button("Execute") {
                     setOnAction {
-                        inputField.scene.stylesheets.add("https://gist.githubusercontent.com/AlexP11223/32bf908cfec37b93ca60f126dbb28992/raw/4194ea1a44bdd4b9970b1596d65c76aa36dc596f/1.css")
                     }
                 }
             }
@@ -103,19 +103,19 @@ print("x: " + toString(y));
         val spansBuilder = StyleSpansBuilder<Collection<String>>()
         while (matcher.find()) {
             val styleClass = (if (matcher.group("KEYWORD") != null)
-                Styles.keyword.name
+                CodeHighlightStyles.keyword.name
             else if (matcher.group("PAREN") != null)
-                "paren"
+                CodeHighlightStyles.paren.name
             else if (matcher.group("BRACE") != null)
-                "brace"
+                CodeHighlightStyles.brace.name
             else if (matcher.group("BRACKET") != null)
-                "bracket"
+                CodeHighlightStyles.bracket.name
             else if (matcher.group("SEMICOLON") != null)
-                "semicolon"
+                CodeHighlightStyles.semicolon.name
             else if (matcher.group("STRING") != null)
-                "string"
+                CodeHighlightStyles.string.name
             else if (matcher.group("COMMENT") != null)
-                "comment"
+                CodeHighlightStyles.comment.name
             else
                 null)!! /* never happens */
             spansBuilder.add(emptyList<String>(), matcher.start() - lastKwEnd)
