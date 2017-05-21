@@ -7,6 +7,9 @@ class Styles : Stylesheet() {
     companion object {
         val mainScreen by cssclass()
         val arrowLabel by cssclass()
+
+        private val paragraphBox by cssclass("paragraph-box")
+        private val hasCaret by csspseudoclass("has-caret")
     }
 
     init {
@@ -16,6 +19,12 @@ class Styles : Stylesheet() {
         arrowLabel {
             fontSize = 1.6.em
             fontWeight = FontWeight.BOLD
+        }
+
+        paragraphBox {
+            and(hasCaret) {
+                backgroundColor = multi(c("#f2f9fc"))
+            }
         }
     }
 }
