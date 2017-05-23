@@ -72,7 +72,7 @@ class MainView : View("") {
 
     init {
         codeArea.textProperty().onChange {
-            viewModel.programCode = it
+            viewModel.programCode = it!!
         }
         viewModel.programCodeProperty.onChange {
             if (it != codeArea.text) {

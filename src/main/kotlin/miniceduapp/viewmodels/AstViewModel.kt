@@ -15,7 +15,7 @@ class AstViewModel : ViewModel() {
     val status = TaskStatus()
 
     val astImageProperty = SimpleObjectProperty<Image>()
-    var astImage by astImageProperty
+    var astImage: Image by astImageProperty
 
     init {
         mainViewModel.programCodeProperty.onChange {
