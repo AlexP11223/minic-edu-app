@@ -15,7 +15,7 @@ import tornadofx.*
 class MainView : View("") {
     val viewModel: MainViewModel by inject()
 
-    var inputField: CodeArea by singleAssign()
+    var codeArea: CodeArea by singleAssign()
     var outputField: TextArea by singleAssign()
 
     override val root = borderpane {
@@ -52,22 +52,12 @@ class MainView : View("") {
         }
         center {
             hbox {
-                inputField = codeEditor(paneOp = {
+                codeArea = codeEditor(paneOp = {
                     hgrow = Priority.ALWAYS
                 }) {
-                    textProperty().onChange {
-                        viewModel.programCode = it
-                    }
                     addSyntaxHighlighting(MiniCSyntaxHighlighter())
                     showLineNumbers()
-                    replaceText("""println("Hello");
-int x = 42;
-int y = x + 6 * 2 / (3 - 1);
-print("x: " + toString(y));
-""")
-
                 }
-
             }
         }
         bottom {
@@ -78,6 +68,23 @@ print("x: " + toString(y));
                 }
             }
         }
+    }
+
+    init {
+        codeArea.textProperty().onChange {
+            viewModel.programCode = it
+        }
+        viewModel.programCodeProperty.onChange {
+            if (it != codeArea.text) {
+                codeArea.replaceText(it)
+            }
+        }
+
+        viewModel.programCode = """println("Hello");
+int x = 42;
+int y = x + 8 * 2 / (3 - 1);
+print("x: " + toString(y));
+"""
     }
 
     fun EventTarget.arrowLabel() = label(" ➔ ") {
