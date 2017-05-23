@@ -2,13 +2,13 @@ package miniceduapp.views
 
 import javafx.event.EventTarget
 import minic.Compiler
-import miniceduapp.controllers.MainController
+import miniceduapp.viewmodels.MainViewModel
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import tornadofx.*
 
 class TokensView : View("Lexer tokens") {
-    val controller: MainController by inject()
+    val mainViewModel: MainViewModel by inject()
 
     var outputArea: CodeArea by singleAssign()
 
@@ -33,8 +33,8 @@ class TokensView : View("Lexer tokens") {
         return opcr(this, codeArea, op);
     }
 
-    fun show() {
-        val text = Compiler(controller.text).tokens
+    override fun onDock() {
+        val text = Compiler(mainViewModel.programCode).tokens
                 .groupBy { it.line }
                 .map { it.value.map { it.name }.joinToString(", ") }
                 .joinToString("\n")
