@@ -33,6 +33,7 @@ class Styles : Stylesheet() {
         paragraphBox {
             and(hasCaret) {
                 backgroundColor = multi(c("#f2f9fc"))
+                backgroundInsets = multi(box(3.px, 3.px, 0.px, 0.px))
             }
         }
 

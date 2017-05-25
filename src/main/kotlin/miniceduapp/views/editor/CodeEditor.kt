@@ -12,7 +12,7 @@ import java.util.regex.Pattern
 
 fun EventTarget.codeEditor(paneOp: (VirtualizedScrollPane<CodeArea>.() -> Unit)? = null, op: (CodeArea.() -> Unit)? = null): CodeArea {
     val codeArea = CodeArea()
-    val scrollPane = VirtualizedScrollPane(codeArea)
+    val scrollPane = VirtualizedScrollPaneExt(codeArea)
 
     addChildIfPossible(scrollPane)
 
