@@ -40,9 +40,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.fxmisc.richtext</groupId>
+            <groupId>com.github.alexp11223</groupId>
             <artifactId>richtextfx</artifactId>
-            <version>0.7-M5</version>
+            <version>0.7-M6a</version>
         </dependency>
 
         <dependency>
