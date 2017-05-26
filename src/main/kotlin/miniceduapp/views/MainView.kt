@@ -1,13 +1,18 @@
 package miniceduapp.views
 
 import javafx.event.EventTarget
+import javafx.scene.control.Alert
+import javafx.scene.control.ButtonType
 import javafx.scene.control.TextArea
 import javafx.scene.layout.Priority
+import miniceduapp.helpers.messageOrString
+import miniceduapp.helpers.setMinimumWindowSize
 import miniceduapp.viewmodels.MainViewModel
 import miniceduapp.views.editor.MiniCSyntaxHighlighter
 import miniceduapp.views.editor.addSyntaxHighlighting
 import miniceduapp.views.editor.codeEditor
 import miniceduapp.views.editor.showLineNumbers
+import miniceduapp.views.events.ErrorEvent
 import miniceduapp.views.styles.Styles
 import org.fxmisc.richtext.CodeArea
 import tornadofx.*
@@ -85,10 +90,20 @@ int x = 42;
 int y = x + 8 * 2 / (3 - 1);
 print("x: " + toString(y));
 """
+
+        subscribe<ErrorEvent> {
+            alert(Alert.AlertType.ERROR, "Error", it.error.messageOrString(), ButtonType.OK)
+        }
+    }
+
+    override fun onDock() {
+        setMinimumWindowSize(600, 700)
     }
 
     fun EventTarget.arrowLabel() = label(" ➔ ") {
         addClass(Styles.arrowLabel)
     }
+
+
 }
 

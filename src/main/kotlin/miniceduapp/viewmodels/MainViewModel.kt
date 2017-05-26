@@ -5,6 +5,6 @@ import tornadofx.*
 
 class MainViewModel : ViewModel() {
 
-    val programCodeProperty = SimpleStringProperty()
+    val programCodeProperty = SimpleStringProperty("")
     var programCode: String by programCodeProperty
 }

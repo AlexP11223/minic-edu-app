@@ -1,43 +1,53 @@
 package miniceduapp.views
 
-import javafx.event.EventTarget
-import minic.Compiler
-import miniceduapp.viewmodels.MainViewModel
+import javafx.collections.ListChangeListener
+import javafx.scene.layout.Priority
+import minic.frontend.lexer.Token
+import miniceduapp.helpers.setMinimumWindowSize
+import miniceduapp.viewmodels.TokensViewModel
+import miniceduapp.views.editor.codeEditor
+import miniceduapp.views.editor.showLineNumbers
 import org.fxmisc.richtext.CodeArea
-import org.fxmisc.richtext.LineNumberFactory
 import tornadofx.*
 
 class TokensView : View("Lexer tokens") {
-    val mainViewModel: MainViewModel by inject()
+    val viewModel: TokensViewModel by inject()
 
     var outputArea: CodeArea by singleAssign()
 
     override val root = hbox {
-        outputArea = codeEditor {
-            minWidth = 450.0
-            minHeight = 400.0
-            isWrapText = true
-            isEditable = false
-            paragraphGraphicFactory = LineNumberFactory.get(this)
+        stackpane {
+            hgrow = Priority.ALWAYS
+            outputArea = codeEditor(paneOp = {
+                hgrow = Priority.ALWAYS
+            }) {
+                isWrapText = true
+                isEditable = false
+                //showLineNumbers() // weird bug, onDock doesn't fire if called here
+            }
+            imageview("loading.gif") {
+                visibleWhen { viewModel.status.running }
+            }
         }
-
         style {
             padding = box(10.px)
         }
     }
 
-    fun EventTarget.codeEditor(op: (CodeArea.() -> Unit)? = null): CodeArea {
-        val codeArea = CodeArea()
-        codeArea.paragraphGraphicFactory = LineNumberFactory.get(codeArea)
-
-        return opcr(this, codeArea, op);
+    init {
+        viewModel.tokens.addListener { change: ListChangeListener.Change<out Token> ->
+            val text = change.list
+                    .groupBy { it.line }
+                    .map { it.value.map { it.name }.joinToString(", ") }
+                    .joinToString("\n")
+            outputArea.replaceText(text)
+        }
     }
 
     override fun onDock() {
-        val text = Compiler(mainViewModel.programCode).tokens
-                .groupBy { it.line }
-                .map { it.value.map { it.name }.joinToString(", ") }
-                .joinToString("\n")
-        outputArea.replaceText(text)
+        setMinimumWindowSize(500, 400)
+        outputArea.showLineNumbers()
+
+        viewModel.loadTokens()
     }
 }
