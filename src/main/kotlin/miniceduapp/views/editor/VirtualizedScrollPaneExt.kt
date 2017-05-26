@@ -11,8 +11,13 @@ class VirtualizedScrollPaneExt<T>(content: T) : VirtualizedScrollPane<T>(content
     private val FOCUSED = PseudoClass.getPseudoClass("focused")
 
     init {
-
-        padding = Insets(10.0, 20.0, 10.0, 20.0)
         content.focusedProperty().addListener { _, _, newVal -> pseudoClassStateChanged(FOCUSED, newVal!!) }
+    }
+
+    override fun layoutChildren() {
+        super.layoutChildren()
+
+        val ins = insets
+        content.resizeRelocate(ins.left, ins.top, width - ins.left - ins.right, height - ins.top - ins.bottom)
     }
 }
