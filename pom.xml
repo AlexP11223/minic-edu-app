@@ -92,6 +92,27 @@
                 <version>8.8.3</version>
                 <configuration>
                     <mainClass>miniceduapp.AppKt</mainClass>
+                    <bundleArguments>
+                        <runtime />
+                    </bundleArguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- required before build-native -->
+                        <id>create-jfxjar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build-jar</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>create-native</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build-native</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -104,5 +125,19 @@
             </plugin>
         </plugins>
     </build>
+
+    <developers>
+        <developer>
+            <name>Alex P</name>
+            <email>alex.pantec@gmail.com</email>
+            <organization>-</organization>
+            <organizationUrl>https://github.com/AlexP11223</organizationUrl>
+        </developer>
+    </developers>
+
+    <organization>
+        <name>Alex P</name>
+        <url>https://github.com/AlexP11223</url>
+    </organization>
 
 </project>
