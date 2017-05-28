@@ -1,10 +1,17 @@
 package miniceduapp.helpers
 
 import javafx.application.Platform
+import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.ReadOnlyBooleanWrapper
 import javafx.util.Duration
 import java.util.*
 import tornadofx.*
+
+/**
+ * Run the specified Runnable on the JavaFX Application Thread at some
+ * unspecified time in the future.
+ */
+fun runLater(op: () -> Unit) = Platform.runLater(op)
 
 /**
  * Run the specified Runnable on the JavaFX Application Thread after a
@@ -26,15 +33,22 @@ fun runLater(delay: Duration, op: () -> Unit): FXTimerTask {
 
 class FXTimerTask(val op: () -> Unit, val timer: Timer) : TimerTask() {
     private val internalRunning = ReadOnlyBooleanWrapper(false)
-    val runningProperty = internalRunning.readOnlyProperty
-    val running by runningProperty
+    val runningProperty: ReadOnlyBooleanProperty get() = internalRunning.readOnlyProperty
+    val running: Boolean get() = runningProperty.value
+
+    private val internalCompleted = ReadOnlyBooleanWrapper(false)
+    val completedProperty: ReadOnlyBooleanProperty get() = internalCompleted.readOnlyProperty
+    val completed: Boolean get() = completedProperty.value
 
     override fun run() {
         internalRunning.value = true
-        try {
-            Platform.runLater(op)
-        } finally {
-            internalRunning.value = false
+        Platform.runLater {
+            try {
+                op()
+            } finally {
+                internalRunning.value = false
+                internalCompleted.value = true
+            }
         }
     }
 }
