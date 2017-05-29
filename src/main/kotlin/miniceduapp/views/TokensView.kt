@@ -3,7 +3,6 @@ package miniceduapp.views
 import javafx.collections.ListChangeListener
 import javafx.scene.layout.Priority
 import minic.frontend.lexer.Token
-import miniceduapp.helpers.setMinimumWindowSize
 import miniceduapp.viewmodels.TokensViewModel
 import miniceduapp.views.editor.codeEditor
 import miniceduapp.views.editor.showLineNumbers
@@ -45,7 +44,7 @@ class TokensView : View("Lexer tokens") {
     }
 
     override fun onDock() {
-        setMinimumWindowSize(500, 400)
+        setWindowMinSize(500, 400)
         outputArea.showLineNumbers()
 
         viewModel.loadTokens()

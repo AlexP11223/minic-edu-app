@@ -2,7 +2,6 @@ package miniceduapp.viewmodels
 
 import de.saxsys.mvvmfx.testingutils.jfxrunner.*
 import miniceduapp.BaseTornadoFxComponentTest
-import miniceduapp.awaitUntil
 import org.junit.Test
 import org.junit.runner.RunWith
 import tornadofx.*
@@ -22,7 +21,7 @@ class TokensViewModelTest : BaseTornadoFxComponentTest() {
         vm.mainViewModel.programCode = "int x = 42;"
         vm.loadTokens()
 
-        vm.status.running.not().awaitUntil()
+        vm.status.completed.awaitUntil()
 
         assertNotEquals(0, vm.tokens.size)
 
@@ -30,7 +29,7 @@ class TokensViewModelTest : BaseTornadoFxComponentTest() {
 
         vm.loadTokens()
 
-        vm.status.running.not().awaitUntil()
+        vm.status.completed.awaitUntil()
 
         assertEquals(prevTokensCount, vm.tokens.size)
     }
@@ -43,7 +42,7 @@ class TokensViewModelTest : BaseTornadoFxComponentTest() {
         vm.mainViewModel.programCode = "int x = 42;"
         vm.loadTokens()
 
-        vm.status.running.not().awaitUntil()
+        vm.status.completed.awaitUntil()
 
         assertNotEquals(0, vm.tokens.size)
 
@@ -52,7 +51,7 @@ class TokensViewModelTest : BaseTornadoFxComponentTest() {
         vm.mainViewModel.programCode = "int x = 42 + 1;"
         vm.loadTokens()
 
-        vm.status.running.not().awaitUntil()
+        vm.status.completed.awaitUntil()
 
         assertEquals(prevTokensCount + 2, vm.tokens.size)
     }

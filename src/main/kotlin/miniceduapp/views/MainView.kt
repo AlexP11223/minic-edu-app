@@ -6,7 +6,6 @@ import javafx.scene.control.ButtonType
 import javafx.scene.control.TextArea
 import javafx.scene.layout.Priority
 import miniceduapp.helpers.messageOrString
-import miniceduapp.helpers.setMinimumWindowSize
 import miniceduapp.viewmodels.MainViewModel
 import miniceduapp.views.editor.MiniCSyntaxHighlighter
 import miniceduapp.views.editor.addSyntaxHighlighting
@@ -97,7 +96,10 @@ print("x: " + toString(y));
     }
 
     override fun onDock() {
-        setMinimumWindowSize(600, 700)
+        setWindowMinSize(500, 400)
+
+        primaryStage.width = 600.0
+        primaryStage.height = 700.0
     }
 
     fun EventTarget.arrowLabel() = label(" ➔ ") {

@@ -4,8 +4,6 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.util.Duration
 import minic.Compiler
 import minic.frontend.lexer.Token
-import miniceduapp.helpers.FXTimerTask
-import miniceduapp.helpers.runLater
 import miniceduapp.views.events.ErrorEvent
 import tornadofx.*
 

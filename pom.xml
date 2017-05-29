@@ -30,7 +30,7 @@
         <dependency>
             <groupId>no.tornado</groupId>
             <artifactId>tornadofx</artifactId>
-            <version>1.7.5</version>
+            <version>1.7.6-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -145,4 +145,12 @@
         <url>https://github.com/AlexP11223</url>
     </organization>
 
+    <repositories>
+        <repository>
+            <id>snapshots-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+    </repositories>
 </project>
