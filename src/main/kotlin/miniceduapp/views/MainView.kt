@@ -17,6 +17,7 @@ import miniceduapp.views.events.*
 import miniceduapp.views.styles.Styles
 import org.fxmisc.richtext.CodeArea
 import tornadofx.*
+import java.io.File
 import java.nio.file.Paths
 
 class MainView : View("Mini-C vizualization/simulation") {
@@ -24,6 +25,8 @@ class MainView : View("Mini-C vizualization/simulation") {
 
     var codeArea: CodeArea by singleAssign()
     var outputField: TextArea by singleAssign()
+
+    var initialDialogDir = "demo"
 
     override val root = borderpane {
         top {
@@ -156,7 +159,14 @@ class MainView : View("Mini-C vizualization/simulation") {
 
     private fun browseFile(mode: FileChooserMode, filters: List<FileExtensionFilter> = viewModel.codeFileFilters): String? {
         val fxFilters = filters.map { FileChooser.ExtensionFilter(it.description, it.extensions) }.toTypedArray()
-        val result = chooseFile("", fxFilters, mode, currentWindow)
+        val result = chooseFile("", fxFilters, mode, currentWindow) {
+            if (File(initialDialogDir).exists()) {
+                initialDirectory = File(initialDialogDir)
+            }
+        }
+        if (result.any()) {
+            initialDialogDir = result.first().parent
+        }
         return result.firstOrNull()?.absolutePath
     }
 
