@@ -5,7 +5,6 @@ import javafx.event.EventTarget
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
 import javafx.scene.control.TextArea
-import javafx.scene.input.KeyCombination
 import javafx.scene.layout.Priority
 import javafx.stage.FileChooser
 import miniceduapp.helpers.messageOrString
@@ -30,21 +29,21 @@ class MainView : View("Mini-C vizualization/simulation") {
         top {
             menubar {
                 menu("File") {
-                    item("New", KeyCombination.valueOf("Shortcut+N")).command = viewModel.createNewCodeCommand
-                    item("Open", KeyCombination.valueOf("Shortcut+O")) {
+                    item("New", "Shortcut+N").command = viewModel.createNewCodeCommand
+                    item("Open", "Shortcut+O") {
                         setOnAction {
                             openCodeFile()
                         }
                         enableWhen { viewModel.openCodeFileCommand.enabled }
                     }
-                    item("Save", KeyCombination.valueOf("Shortcut+S")).command = viewModel.saveCodeFileCommand
-                    item("Save as", KeyCombination.valueOf("Shortcut+Shift+S")) {
+                    item("Save", "Shortcut+S").command = viewModel.saveCodeFileCommand
+                    item("Save as", "Shortcut+Shift+S") {
                         setOnAction {
                             saveNewCodeFile()
                         }
                         enableWhen { viewModel.saveNewCodeFileCommand.enabled }
                     }
-                    item("Quit", KeyCombination.valueOf("Shortcut+Q")).action {
+                    item("Quit", "Shortcut+Q").action {
                         Platform.exit()
                     }
                 }

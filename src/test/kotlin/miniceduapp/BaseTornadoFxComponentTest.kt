@@ -8,19 +8,19 @@ import java.util.*
 
 open class BaseTornadoFxComponentTest : Component() {
     private var ignoreErrors = false
-    private var finished = false // should unsubscribe instead of this
+    private val events = mutableListOf<FXEventRegistration>()
 
     private val errors = Collections.synchronizedCollection(mutableListOf<Throwable>())
 
     init {
-        subscribe<ErrorEvent> {
-            if (!ignoreErrors && !finished) {
+        events += subscribe<ErrorEvent> {
+            if (!ignoreErrors) {
                 errors.add(it.error)
                 throw it.error
             }
         }
-        subscribe<ErrorMessageEvent> {
-            if (!ignoreErrors && !finished) {
+        events += subscribe<ErrorMessageEvent> {
+            if (!ignoreErrors) {
                 errors.add(Exception(it.text))
                 throw Exception(it.text)
             }
@@ -29,7 +29,10 @@ open class BaseTornadoFxComponentTest : Component() {
 
     @After
     fun afterTest() {
-        finished = true
+        events.forEach {
+            it.unsubscribe()
+        }
+        events.clear()
 
         if (errors.any()) {
             throw errors.first()

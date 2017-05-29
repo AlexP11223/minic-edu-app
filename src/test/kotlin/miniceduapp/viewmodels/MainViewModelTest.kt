@@ -71,9 +71,8 @@ class MainViewModelTest : BaseTornadoFxComponentTest() {
         val filepath = tmpFolder.root.absolutePath + "/not_existing.mc"
 
         var error = ""
-        subscribe<ErrorMessageEvent> {
+        subscribe<ErrorMessageEvent>(times = 1) {
             error = it.text
-            //unsubscribe()
         }
 
         ignoreErrors {
@@ -89,9 +88,8 @@ class MainViewModelTest : BaseTornadoFxComponentTest() {
         vm.programCode = "hello"
 
         val filepath = tmpFolder.root.absolutePath + "/program.mc"
-        subscribe<RequestFilePathEvent> {
+        subscribe<RequestFilePathEvent>(times = 1) {
             it.result = filepath
-            unsubscribe()
         }
 
         assertTrue(vm.saveCodeFileCommand.isEnabled)
@@ -115,9 +113,8 @@ class MainViewModelTest : BaseTornadoFxComponentTest() {
         vm.programCode = "hello"
 
         val filepath = tmpFolder.root.absolutePath + "/program.mc"
-        subscribe<RequestFilePathEvent> {
+        subscribe<RequestFilePathEvent>(times = 1) {
             it.result = filepath
-            unsubscribe()
         }
 
         assertTrue(vm.saveCodeFileCommand.isEnabled)
@@ -147,9 +144,8 @@ class MainViewModelTest : BaseTornadoFxComponentTest() {
 
         val filepath = tmpFolder.root.absolutePath + "/program.mc"
 
-        subscribe<RequestFilePathEvent> {
+        subscribe<RequestFilePathEvent>(times = 1) {
             it.result = filepath
-            unsubscribe()
         }
 
         vm.saveCodeFileCommand.execute()
@@ -177,9 +173,8 @@ class MainViewModelTest : BaseTornadoFxComponentTest() {
 
         assertTrue(vm.saveCodeFileCommand.isEnabled)
 
-        subscribe<RequestFilePathEvent> {
+        subscribe<RequestFilePathEvent>(times = 1) {
             //it.result = null
-            unsubscribe()
         }
 
         vm.saveCodeFileCommand.execute()
