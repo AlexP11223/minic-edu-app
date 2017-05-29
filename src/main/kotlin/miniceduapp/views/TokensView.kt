@@ -6,6 +6,7 @@ import minic.frontend.lexer.Token
 import miniceduapp.viewmodels.TokensViewModel
 import miniceduapp.views.editor.codeEditor
 import miniceduapp.views.editor.showLineNumbers
+import miniceduapp.views.styles.Styles
 import org.fxmisc.richtext.CodeArea
 import tornadofx.*
 
@@ -15,6 +16,7 @@ class TokensView : View("Lexer tokens") {
     var outputArea: CodeArea by singleAssign()
 
     override val root = hbox {
+        addClass(Styles.windowContent)
         stackpane {
             hgrow = Priority.ALWAYS
             outputArea = codeEditor(paneOp = {
@@ -27,9 +29,6 @@ class TokensView : View("Lexer tokens") {
             imageview("loading.gif") {
                 visibleWhen { viewModel.status.running }
             }
-        }
-        style {
-            padding = box(10.px)
         }
     }
 
