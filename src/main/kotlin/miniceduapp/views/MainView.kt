@@ -2,6 +2,7 @@ package miniceduapp.views
 
 import javafx.application.Platform
 import javafx.event.EventTarget
+import javafx.geometry.Pos
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
 import javafx.scene.control.TextArea
@@ -75,15 +76,24 @@ class MainView : View("Mini-C vizualization/simulation") {
                         command = viewModel.saveCodeFileCommand
                     }
                 }
-                label(viewModel.filePathProperty.stringBinding { Paths.get(it).fileName.toString() }) {
-                    toggleClass(Styles.modifiedInput, viewModel.hasUnsavedCodeProperty)
-                }
-                codeArea = codeEditor(paneOp = {
-                    hgrow = Priority.ALWAYS
+                vbox {
                     vgrow = Priority.ALWAYS
-                }) {
-                    addSyntaxHighlighting(MiniCSyntaxHighlighter())
-                    showLineNumbers()
+                    hbox {
+                        label(viewModel.filePathProperty.stringBinding { Paths.get(it).fileName.toString() }) {
+                            toggleClass(Styles.modifiedInput, viewModel.hasUnsavedCodeProperty)
+                        }
+                        label("*") {
+                            addClass(Styles.modifiedInput)
+                            visibleWhen { viewModel.hasUnsavedCodeProperty.and(viewModel.filePathProperty.isNotEmpty) }
+                        }
+                    }
+                    codeArea = codeEditor(paneOp = {
+                        hgrow = Priority.ALWAYS
+                        vgrow = Priority.ALWAYS
+                    }) {
+                        addSyntaxHighlighting(MiniCSyntaxHighlighter())
+                        showLineNumbers()
+                    }
                 }
                 hbox {
                     button("Tokens") {
