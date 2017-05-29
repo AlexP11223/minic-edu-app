@@ -23,7 +23,10 @@ class MainViewModel : ViewModel() {
     val hasUnsavedCodeProperty: ReadOnlyBooleanProperty get() = _hasUnsavedCodeProperty.readOnlyProperty
     val hasUnsavedCode: Boolean get() = _hasUnsavedCodeProperty.value
 
-    val codeFileFilters = listOf(FileExtensionFilter("Mini-C source code", listOf("*.mc")))
+    val codeFileFilters = listOf(
+            FileExtensionFilter("Mini-C source code", listOf("*.mc")),
+            FileExtensionFilter("All files", listOf("*.*"))
+    )
 
     init {
         programCodeProperty.onChange {
