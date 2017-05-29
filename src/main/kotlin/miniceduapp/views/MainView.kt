@@ -137,11 +137,7 @@ class MainView : View("Mini-C vizualization/simulation") {
             alert(Alert.AlertType.ERROR, "Error", it.text, ButtonType.OK)
         }
         subscribe<RequestFilePathEvent> {
-            val result = chooseFile("", it.filters.map { FileChooser.ExtensionFilter(it.description, it.extensions) }.toTypedArray(),
-                    FileChooserMode.Save, currentWindow)
-            if (!result.isEmpty()) {
-                it.result = result.first().absolutePath
-            }
+            it.result = browseFile(FileChooserMode.Save, it.filters)
         }
 
         viewModel.loadSampleCodeCommand.execute()
@@ -158,21 +154,21 @@ class MainView : View("Mini-C vizualization/simulation") {
         addClass(Styles.arrowLabel)
     }
 
-    private fun browseCodeFile(mode: FileChooserMode): String? {
-        val result = chooseFile("", viewModel.codeFileFilters.map { FileChooser.ExtensionFilter(it.description, it.extensions) }.toTypedArray(),
-                mode, currentWindow)
+    private fun browseFile(mode: FileChooserMode, filters: List<FileExtensionFilter> = viewModel.codeFileFilters): String? {
+        val fxFilters = filters.map { FileChooser.ExtensionFilter(it.description, it.extensions) }.toTypedArray()
+        val result = chooseFile("", fxFilters, mode, currentWindow)
         return result.firstOrNull()?.absolutePath
     }
 
     private fun saveNewCodeFile() {
-        val filePath = browseCodeFile(FileChooserMode.Save)
+        val filePath = browseFile(FileChooserMode.Save)
         if (filePath != null) {
             viewModel.saveNewCodeFileCommand.execute(filePath)
         }
     }
 
     private fun openCodeFile() {
-        val filePath = browseCodeFile(FileChooserMode.Single)
+        val filePath = browseFile(FileChooserMode.Single)
         if (filePath != null) {
             viewModel.openCodeFileCommand.execute(filePath)
         }
