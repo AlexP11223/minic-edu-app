@@ -5,17 +5,25 @@ import javafx.embed.swing.SwingFXUtils
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
 import javafx.scene.image.Image
+import javafx.util.Duration
 import minic.Compiler
+import minic.frontend.ast.Program
 import miniceduapp.helpers.messageOrString
+import miniceduapp.views.events.ErrorEvent
 import tornadofx.*
 
-class AstViewModel : ViewModel() {
+class AstViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
     val mainViewModel: MainViewModel by inject()
 
     val status = TaskStatus()
 
     val astImageProperty = SimpleObjectProperty<Image>()
     var astImage: Image by astImageProperty
+
+    val astProperty = SimpleObjectProperty<Program>()
+    var ast: Program by astProperty
+
+    val programCodeProperty = bind { mainViewModel.programCodeProperty }
 
     init {
         mainViewModel.programCodeProperty.onChange {
@@ -25,11 +33,13 @@ class AstViewModel : ViewModel() {
 
     fun loadAst() {
         runAsync(status) {
-            SwingFXUtils.toFXImage(Compiler(mainViewModel.programCode).drawAst(), null)
+            val compiler = Compiler(mainViewModel.programCode)
+            SwingFXUtils.toFXImage(compiler.drawAst(), null) to compiler.ast
         } ui {
-            astImage = it
+            astImage = it.first
+            ast = it.second
         } fail {
-            alert(Alert.AlertType.ERROR, "Error", it.messageOrString(), ButtonType.OK)
+            fire(ErrorEvent(it))
         }
     }
 

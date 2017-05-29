@@ -4,7 +4,12 @@ import javafx.scene.control.Slider
 import javafx.scene.image.ImageView
 import javafx.scene.layout.Priority
 import miniceduapp.viewmodels.AstViewModel
+import miniceduapp.views.editor.MiniCSyntaxHighlighter
+import miniceduapp.views.editor.addSyntaxHighlighting
+import miniceduapp.views.editor.codeEditor
+import miniceduapp.views.editor.showLineNumbers
 import miniceduapp.views.styles.Styles
+import org.fxmisc.richtext.CodeArea
 import tornadofx.*
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -17,20 +22,33 @@ class AstView : View("AST") {
     var img: ImageView by singleAssign()
     var zoomSlider: Slider by singleAssign()
 
-    override val root = hbox {
-        minWidth = 1000.0
-        minHeight = 700.0
+    var codeArea: CodeArea by singleAssign()
+
+    override val root = hbox(15) {
+        addClass(Styles.windowContent)
         vbox {
+            hgrow = Priority.ALWAYS
+            maxWidth = 500.0
+            codeArea = codeEditor(paneOp = {
+                minWidth = 300.0
+                vgrow = Priority.ALWAYS
+            }) {
+                addSyntaxHighlighting(MiniCSyntaxHighlighter())
+                //showLineNumbers() // weird bug, onDock doesn't fire if called here
+                selectionProperty().onChange {
+                    println(it)
+                }
+            }
+        }
+        vbox {
+            hgrow = Priority.ALWAYS
             stackpane {
+                vgrow = Priority.ALWAYS
                 scrollpane {
                     img = imageview {
                         preserveRatioProperty().set(true)
                         imageProperty().bind(viewModel.astImageProperty)
                     }
-                    hgrow = Priority.ALWAYS
-                    vgrow = Priority.ALWAYS
-                    minWidth = 1000.0
-                    minHeight = 700.0
                     addClass(Styles.whitePanel)
                 }
                 imageview("loading.gif") {
@@ -52,12 +70,20 @@ class AstView : View("AST") {
                 label("%")
             }
         }
-        style {
-            padding = box(10.px)
+    }
+
+    init {
+        viewModel.programCodeProperty.onChange {
+            if (it != codeArea.text) {
+                codeArea.replaceText(it)
+            }
         }
     }
 
     override fun onDock() {
+        setWindowMinSize(1100, 700)
+        codeArea.showLineNumbers()
+
         viewModel.loadAst()
     }
 }
