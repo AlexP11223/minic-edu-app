@@ -11,6 +11,7 @@ class Styles : Stylesheet() {
         val whitePanel by cssclass()
         val iconButton by cssclass()
         val modifiedInput by cssclass()
+        val outputArea by cssclass()
 
         private val paragraphBox by cssclass("paragraph-box")
         private val hasCaret by csspseudoclass("has-caret")
@@ -34,8 +35,16 @@ class Styles : Stylesheet() {
 
         paragraphBox {
             and(hasCaret) {
-                backgroundColor = multi(c("#f2f9fc"))
-                backgroundInsets = multi(box(3.px, 3.px, 0.px, 0.px))
+                backgroundColor += c("#f2f9fc")
+                backgroundInsets += box(3.px, 3.px, 0.px, 0.px)
+            }
+        }
+
+        outputArea {
+            paragraphBox {
+                and(hasCaret) {
+                    backgroundColor += Color.TRANSPARENT
+                }
             }
         }
 

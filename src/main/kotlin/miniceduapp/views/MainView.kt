@@ -2,19 +2,16 @@ package miniceduapp.views
 
 import javafx.application.Platform
 import javafx.event.EventTarget
+import javafx.geometry.Point2D
 import javafx.geometry.Pos
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
-import javafx.scene.control.TextArea
 import javafx.scene.input.KeyCode
 import javafx.scene.layout.Priority
 import javafx.stage.FileChooser
 import miniceduapp.helpers.messageOrString
 import miniceduapp.viewmodels.MainViewModel
-import miniceduapp.views.editor.MiniCSyntaxHighlighter
-import miniceduapp.views.editor.addSyntaxHighlighting
-import miniceduapp.views.editor.codeEditor
-import miniceduapp.views.editor.showLineNumbers
+import miniceduapp.views.editor.*
 import miniceduapp.views.events.*
 import miniceduapp.views.styles.Styles
 import org.fxmisc.richtext.CodeArea
@@ -26,7 +23,7 @@ class MainView : View("Mini-C vizualization/simulation") {
     val viewModel: MainViewModel by inject()
 
     var codeArea: CodeArea by singleAssign()
-    var outputArea: TextArea by singleAssign()
+    var outputArea: CodeArea by singleAssign()
 
     var initialDialogDir = "demo"
 
@@ -135,9 +132,13 @@ class MainView : View("Mini-C vizualization/simulation") {
                 vbox(10) {
                     vbox {
                         label("Output")
-                        outputArea = textarea(viewModel.outputProperty) {
-                            maxHeight = 120.0
+                        outputArea = codeEditor(paneOp = {
+                            minHeight = 140.0
+                            maxHeight = 140.0
+                        }) {
+                            addClass(Styles.outputArea)
                             isEditable = false
+                            addSyntaxHighlighting(ProgramExecutionHighlighter())
                         }
                     }
                     hbox(10) {
@@ -173,23 +174,22 @@ class MainView : View("Mini-C vizualization/simulation") {
                 codeArea.replaceText(it)
             }
         }
-        outputArea.textProperty().onChange {
-            outputArea.appendText("")
-        }
+        viewModel.outputProperty.onChange {
+            outputArea.replaceText(it)
 
-        // autoscroll
-        outputArea.textProperty().onChange {
+            // autoscroll
             if (!scrollingOutput) {
                 scrollingOutput = true
                 runLater(10.millis) {
-                    outputArea.scrollTop = Double.MAX_VALUE
+                    outputArea.scrollBy(Point2D(0.0, Double.MAX_VALUE))
                     scrollingOutput = false
                 }
             }
         }
+
         viewModel.isExecutingProgramProperty.onChange {
-            runLater(10.millis) {
-                outputArea.scrollTop = Double.MAX_VALUE
+            runLater(100.millis) {
+                outputArea.scrollBy(Point2D(0.0, Double.MAX_VALUE))
             }
         }
 

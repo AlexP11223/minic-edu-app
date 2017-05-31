@@ -6,7 +6,7 @@ import miniceduapp.views.styles.*
 import tornadofx.*
 
 
-class MyApp: App(MainView::class, Styles::class, CodeHighlightStyles::class)
+class MyApp: App(MainView::class, Styles::class, CodeHighlightStyles::class, ProgramExecutionStyles::class)
 
 fun main(args: Array<String>) {
     importStylesheet("/richtextfx.css")
