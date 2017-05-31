@@ -9,6 +9,8 @@ class CodeHighlightStyles : Stylesheet(), HighlightStyle {
 
     companion object {
         val keyword by cssclass()
+        val datatype by cssclass()
+        val number by cssclass()
         val semicolon by cssclass()
         val paren by cssclass()
         val bracket by cssclass()
@@ -20,6 +22,8 @@ class CodeHighlightStyles : Stylesheet(), HighlightStyle {
     override val classes: List<String>
         get() = listOf(
                 keyword.name,
+                datatype.name,
+                number.name,
                 semicolon.name,
                 paren.name,
                 bracket.name,
@@ -33,12 +37,18 @@ class CodeHighlightStyles : Stylesheet(), HighlightStyle {
             fontWeight = FontWeight.BOLD
             fill = Color.BLUE
         }
+        datatype {
+            fontWeight = FontWeight.BOLD
+            fill = Color.BLUE
+        }
+        number {
+            fill = Color.BLUE
+        }
         semicolon {
             fontWeight = FontWeight.BOLD
         }
         paren {
             fontWeight = FontWeight.BOLD
-            fill = Color.FIREBRICK
         }
         bracket {
             fontWeight = FontWeight.BOLD
@@ -49,7 +59,7 @@ class CodeHighlightStyles : Stylesheet(), HighlightStyle {
             fill = Color.TEAL
         }
         string {
-            fill = Color.GREEN
+            fill = c("#A31515")
         }
         comment {
             fill = c(128, 128, 128)
