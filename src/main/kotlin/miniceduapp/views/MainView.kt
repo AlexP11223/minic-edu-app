@@ -6,6 +6,7 @@ import javafx.geometry.Pos
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
 import javafx.scene.control.TextArea
+import javafx.scene.input.KeyCode
 import javafx.scene.layout.Priority
 import javafx.stage.FileChooser
 import miniceduapp.helpers.messageOrString
@@ -25,9 +26,11 @@ class MainView : View("Mini-C vizualization/simulation") {
     val viewModel: MainViewModel by inject()
 
     var codeArea: CodeArea by singleAssign()
-    var outputField: TextArea by singleAssign()
+    var outputArea: TextArea by singleAssign()
 
     var initialDialogDir = "demo"
+
+    private var scrollingOutput = false // for autoscrolling to bottom via timer, doesn't work otherwise, not sure why
 
     override val root = borderpane {
         top {
@@ -93,6 +96,7 @@ class MainView : View("Mini-C vizualization/simulation") {
                     }) {
                         addSyntaxHighlighting(MiniCSyntaxHighlighter())
                         showLineNumbers()
+                        editableProperty().bind(viewModel.isExecutingProgramProperty.not())
                     }
                 }
                 hbox {
@@ -102,31 +106,58 @@ class MainView : View("Mini-C vizualization/simulation") {
                         }
                     }
                     arrowLabel()
-                    vbox {
+                    vbox(5) {
                         button("   AST   ") {
                             setOnAction {
                                 find<AstView>().openWindow()
                             }
                         }
                         button("Symbols") {
-                            vboxConstraints { marginTop = 5.0 }
                         }
                     }
                     arrowLabel()
                     button("Bytecode")
                     arrowLabel()
-                    button("Execute", imageview("run.png")) {
-                        shortcut("F9")
-                        tooltip("Run the program (F9)")
-                        setOnAction {
-                            println("exec")
+                    vbox(5) {
+                        button("Execute", imageview("run.png")) {
+                            shortcut("F9")
+                            tooltip("Run the program (F9)")
+                            command = viewModel.executeCodeCommand
+                        }
+                        button("Stop", imageview("stop.png")) {
+                            shortcut("F10")
+                            tooltip("Stop the program (F10)")
+                            command = viewModel.stopCodeExecutionCommand
+                            visibleWhen { viewModel.isExecutingProgramProperty }
                         }
                     }
                 }
-                vbox {
-                    label("Output")
-                    outputField = textarea {
-                        maxHeight = 100.0
+                vbox(10) {
+                    vbox {
+                        label("Output")
+                        outputArea = textarea(viewModel.outputProperty) {
+                            maxHeight = 120.0
+                            isEditable = false
+                        }
+                    }
+                    hbox(10) {
+                        label("Input") {
+                            style {
+                                alignment = Pos.CENTER_LEFT
+                            }
+                        }
+                        textfield(viewModel.inputProperty) {
+                            hgrow = Priority.ALWAYS
+                            setOnKeyPressed {
+                                if (it.code == KeyCode.ENTER) {
+                                    viewModel.writeInputCommand.execute()
+                                }
+                            }
+                        }
+                        button("Enter") {
+                            command = viewModel.writeInputCommand
+                        }
+                        removeWhen { viewModel.isExecutingProgramProperty.not().or(viewModel.hasInputOperationsProperty.not()) }
                     }
                 }
             }
@@ -140,6 +171,25 @@ class MainView : View("Mini-C vizualization/simulation") {
         viewModel.programCodeProperty.onChange {
             if (it != codeArea.text) {
                 codeArea.replaceText(it)
+            }
+        }
+        outputArea.textProperty().onChange {
+            outputArea.appendText("")
+        }
+
+        // autoscroll
+        outputArea.textProperty().onChange {
+            if (!scrollingOutput) {
+                scrollingOutput = true
+                runLater(10.millis) {
+                    outputArea.scrollTop = Double.MAX_VALUE
+                    scrollingOutput = false
+                }
+            }
+        }
+        viewModel.isExecutingProgramProperty.onChange {
+            runLater(10.millis) {
+                outputArea.scrollTop = Double.MAX_VALUE
             }
         }
 

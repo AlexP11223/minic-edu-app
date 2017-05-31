@@ -1,13 +1,16 @@
 package miniceduapp.viewmodels
 
 import javafx.beans.property.*
+import miniceduapp.CodeExecutor
 import miniceduapp.helpers.messageOrString
 import miniceduapp.views.events.ErrorEvent
 import miniceduapp.views.events.ErrorMessageEvent
 import miniceduapp.views.events.FileExtensionFilter
 import miniceduapp.views.events.RequestFilePathEvent
+import org.apache.commons.io.FilenameUtils
 import tornadofx.*
 import java.io.File
+import java.nio.file.Paths
 
 class MainViewModel : ViewModel() {
     val programCodeProperty = SimpleStringProperty("")
@@ -22,6 +25,26 @@ class MainViewModel : ViewModel() {
     private var _hasUnsavedCode by _hasUnsavedCodeProperty
     val hasUnsavedCodeProperty: ReadOnlyBooleanProperty get() = _hasUnsavedCodeProperty.readOnlyProperty
     val hasUnsavedCode: Boolean get() = _hasUnsavedCodeProperty.value
+
+    private val _isExecutingProgramProperty = ReadOnlyBooleanWrapper(false)
+    private var _isExecutingProgram by _isExecutingProgramProperty
+    val isExecutingProgramProperty: ReadOnlyBooleanProperty get() = _isExecutingProgramProperty.readOnlyProperty
+    val isExecutingProgram: Boolean get() = _isExecutingProgramProperty.value
+
+    private val _hasInputOperationsProperty = ReadOnlyBooleanWrapper(false)
+    private var _hasInputOperations by _hasInputOperationsProperty
+    val hasInputOperationsProperty: ReadOnlyBooleanProperty get() = _hasInputOperationsProperty.readOnlyProperty
+    val hasInputOperations: Boolean get() = _hasInputOperationsProperty.value
+
+    private val _outputProperty = ReadOnlyStringWrapper("")
+    private var _output by _outputProperty
+    val outputProperty: ReadOnlyStringProperty get() = _outputProperty.readOnlyProperty
+    val output: String get() = _outputProperty.value
+
+    val inputProperty = SimpleStringProperty("")
+    var input: String by inputProperty
+
+    private var codeExecutor: CodeExecutor? = null
 
     val codeFileFilters = listOf(
             FileExtensionFilter("Mini-C source code", listOf("*.mc")),
@@ -44,6 +67,15 @@ class MainViewModel : ViewModel() {
     val createNewCodeCommand = command(this::createNewCode)
 
     val loadSampleCodeCommand = command(this::loadSampleCode)
+
+    val executeCodeCommand = command(this::executeCode,
+            enabled = isExecutingProgramProperty.not())
+
+    val stopCodeExecutionCommand = command(this::stopCodeExecution,
+            enabled = isExecutingProgramProperty)
+
+    val writeInputCommand = command(this::writeInput,
+            enabled = isExecutingProgramProperty)
 
     private fun saveCodeFile() {
         val fp = if (filePath.isNullOrEmpty()) {
@@ -99,5 +131,37 @@ int y = x + 8 * 2 / (3 - 1);
 print("x: " + toString(y));
 """
         _hasUnsavedCode = false
+    }
+    
+    private fun executeCode() {
+        _output = ""
+        _isExecutingProgram = true
+
+        val simulatedFileName = if (filePath.isNullOrEmpty()) "program.mc" else Paths.get(filePath).fileName.toString()
+        _output += "> minic $simulatedFileName\n"
+
+        codeExecutor = CodeExecutor(programCode, onOutput = {
+            _output += it
+        }, onFail = {
+            fire(ErrorEvent(it))
+        }, onFinish = {
+            _isExecutingProgram = false
+        }, onCompiled = {
+            _output += "> java ${FilenameUtils.getBaseName(simulatedFileName)}\n"
+        })
+        _hasInputOperations = codeExecutor!!.hasInputOperations
+
+        codeExecutor!!.start()
+    }
+
+    private fun stopCodeExecution() {
+        codeExecutor?.stop()
+    }
+
+    private fun writeInput() {
+        val str = input.trim() + "\n"
+        _output += str
+        input = ""
+        codeExecutor?.writeInput(str)
     }
 }
