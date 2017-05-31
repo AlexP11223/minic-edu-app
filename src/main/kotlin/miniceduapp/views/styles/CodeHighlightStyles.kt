@@ -2,9 +2,11 @@ package miniceduapp.views.styles
 
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
+import miniceduapp.views.editor.HighlightStyle
 import tornadofx.*
 
-class CodeHighlightStyles : Stylesheet() {
+class CodeHighlightStyles : Stylesheet(), HighlightStyle {
+
     companion object {
         val keyword by cssclass()
         val semicolon by cssclass()
@@ -14,6 +16,17 @@ class CodeHighlightStyles : Stylesheet() {
         val string by cssclass()
         val comment by cssclass()
     }
+
+    override val classes: List<String>
+        get() = listOf(
+                keyword.name,
+                semicolon.name,
+                paren.name,
+                bracket.name,
+                brace.name,
+                string.name,
+                comment.name
+        )
 
     init {
         keyword {
