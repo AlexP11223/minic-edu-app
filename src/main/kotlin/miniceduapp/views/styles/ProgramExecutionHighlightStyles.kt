@@ -9,6 +9,8 @@ class ProgramExecutionStyles : Stylesheet(), HighlightStyle {
     companion object {
         val command by cssclass()
         val exception by cssclass()
+
+        private val rtfxBackgroundColor by cssproperty<Color>("-rtfx-background-color")
     }
 
     override val classes: List<String>
@@ -20,6 +22,7 @@ class ProgramExecutionStyles : Stylesheet(), HighlightStyle {
     init {
         command {
             fill = c("#65657D")
+            rtfxBackgroundColor.value = c("#ecfaeb")
         }
         exception {
             fill = Color.RED

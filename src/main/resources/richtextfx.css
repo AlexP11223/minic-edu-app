@@ -50,8 +50,3 @@ Based on https://stackoverflow.com/questions/37808715/how-to-make-look-and-feel-
 .virtualized-scroll-pane {
     -fx-padding: 0.08333325em;
 }
-
-/* not supported in type-safe CSS */
-.command {
-    -rtfx-background-color: #ecfaeb
-}
