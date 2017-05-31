@@ -9,6 +9,7 @@ import javafx.scene.control.ButtonType
 import javafx.scene.input.KeyCode
 import javafx.scene.layout.Priority
 import javafx.stage.FileChooser
+import minic.frontend.validation.Error
 import miniceduapp.helpers.messageOrString
 import miniceduapp.viewmodels.MainViewModel
 import miniceduapp.views.editor.*
@@ -160,6 +161,21 @@ class MainView : View("Mini-C vizualization/simulation") {
                         }
                         removeWhen { viewModel.isExecutingProgramProperty.not().or(viewModel.hasInputOperationsProperty.not()) }
                     }
+                }
+                vbox {
+                    label("Errors")
+                    tableview(viewModel.errors) {
+                        column("", Error::position).cellFormat {
+                            graphic = imageview("error.png")
+                        }
+                        column("Line", Error::position).cellFormat {
+                            text = "${it.line}:${it.column}"
+                        }
+                        column("Description", Error::message)
+                        columnResizePolicy = SmartResize.POLICY
+                        maxHeight = 100.0
+                    }
+                    removeWhen { booleanBinding(viewModel.errors) { isEmpty() } }
                 }
             }
         }

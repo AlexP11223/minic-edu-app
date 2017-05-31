@@ -1,6 +1,8 @@
 package miniceduapp.viewmodels
 
 import javafx.beans.property.*
+import minic.Compiler
+import minic.frontend.validation.Error
 import miniceduapp.CodeExecutor
 import miniceduapp.helpers.messageOrString
 import miniceduapp.views.events.ErrorEvent
@@ -43,6 +45,8 @@ class MainViewModel : ViewModel() {
 
     val inputProperty = SimpleStringProperty("")
     var input: String by inputProperty
+
+    val errors = mutableListOf<Error>().observable()
 
     private var codeExecutor: CodeExecutor? = null
 
