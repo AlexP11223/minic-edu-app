@@ -55,7 +55,7 @@ class CodeExecutor(val code: String,
 
                 compile(programFilePath)
 
-                onCompiled()
+                runLater { onCompiled() }
 
                 run(programFilePath)
             } catch (ex: Throwable) {
