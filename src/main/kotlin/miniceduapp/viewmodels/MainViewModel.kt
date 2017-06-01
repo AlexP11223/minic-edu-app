@@ -1,6 +1,7 @@
 package miniceduapp.viewmodels
 
 import javafx.beans.property.*
+import javafx.util.Duration
 import minic.Compiler
 import minic.frontend.validation.Error
 import miniceduapp.CodeExecutor
@@ -14,7 +15,7 @@ import tornadofx.*
 import java.io.File
 import java.nio.file.Paths
 
-class MainViewModel : ViewModel() {
+class MainViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
     val programCodeProperty = SimpleStringProperty("")
     var programCode: String by programCodeProperty
 
@@ -48,16 +49,25 @@ class MainViewModel : ViewModel() {
 
     val errors = mutableListOf<Error>().observable()
 
-    private var codeExecutor: CodeExecutor? = null
+    val validationTaskStatus = TaskStatus()
 
     val codeFileFilters = listOf(
             FileExtensionFilter("Mini-C source code", listOf("*.mc")),
             FileExtensionFilter("All files", listOf("*.*"))
     )
 
+    private var codeExecutor: CodeExecutor? = null
+
+    private var validationTimerTask: FXTimerTask? = null
+
     init {
         programCodeProperty.onChange {
             _hasUnsavedCode = true
+            validationTimerTask?.cancel()
+
+            validationTimerTask = runLater(updateDelay) {
+                validateCode()
+            }
         }
     }
 
@@ -80,6 +90,23 @@ class MainViewModel : ViewModel() {
 
     val writeInputCommand = command(this::writeInput,
             enabled = isExecutingProgramProperty)
+
+    fun validateCode() {
+        validationTimerTask?.cancel()
+
+        val code = programCode // probably shouldn't access property from another thread
+
+        runAsync(validationTaskStatus) {
+            Compiler(code).validate()
+        } ui {
+            if (errors != it) {
+                errors.clear()
+                errors.addAll(it)
+            }
+        } fail {
+            fire(ErrorEvent(it))
+        }
+    }
 
     private fun saveCodeFile() {
         val fp = if (filePath.isNullOrEmpty()) {
@@ -116,6 +143,8 @@ class MainViewModel : ViewModel() {
             programCode = File(newFilePath).readText()
             _filePath = newFilePath
             _hasUnsavedCode = false
+
+            validateCode()
         } catch (ex: Throwable) {
             fire(ErrorEvent(ex, "Failed to open file '$newFilePath': ${ex.messageOrString()}."))
         }
@@ -125,6 +154,7 @@ class MainViewModel : ViewModel() {
         programCode = ""
         _filePath = ""
         _hasUnsavedCode = false
+        errors.clear()
     }
 
     private fun loadSampleCode() {

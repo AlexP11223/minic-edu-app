@@ -42,6 +42,8 @@ class MainViewModelTest : BaseTornadoFxComponentTest() {
         assertTrue(vm.executeCodeCommand.isEnabled)
         assertFalse(vm.stopCodeExecutionCommand.isEnabled)
         assertFalse(vm.writeInputCommand.isEnabled)
+
+        assertTrue(vm.errors.isEmpty())
     }
 
     @Test
@@ -253,5 +255,32 @@ println("Hello, " + name);
         assertTrue(vm.executeCodeCommand.isEnabled)
         assertFalse(vm.stopCodeExecutionCommand.isEnabled)
         assertFalse(vm.writeInputCommand.isEnabled)
+    }
+
+    @Test
+    @TestInJfxThread
+    fun detectsErrors() {
+        assertTrue(vm.errors.isEmpty())
+
+        vm.programCode = "int x = y;"
+
+        vm.validateCode()
+
+        vm.validationTaskStatus.completed.awaitUntil()
+        assertTrue(vm.errors.isNotEmpty())
+
+        vm.programCode = "int x = 42;"
+
+        vm.validateCode()
+
+        vm.validationTaskStatus.completed.awaitUntil()
+        assertTrue(vm.errors.isEmpty())
+
+        vm.programCode = "int x = 42"
+
+        vm.validateCode()
+
+        vm.validationTaskStatus.completed.awaitUntil()
+        assertTrue(vm.errors.isNotEmpty())
     }
 }

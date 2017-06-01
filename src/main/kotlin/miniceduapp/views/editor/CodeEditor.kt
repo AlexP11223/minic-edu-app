@@ -30,6 +30,14 @@ fun CodeArea.addSyntaxHighlighting(syntaxHighlighter: SyntaxHighlighter) {
     richChanges()
             .filter { ch -> ch.inserted != ch.removed}
             .subscribe {
-                setStyleSpans(0, syntaxHighlighter.computeHighlighting(text))
+                updateSyntaxHighlighting(syntaxHighlighter)
             }
+}
+
+fun CodeArea.updateSyntaxHighlighting(syntaxHighlighter: SyntaxHighlighter) {
+    setStyleSpans(0, syntaxHighlighter.computeHighlighting(text))
+}
+
+fun CodeArea.setCursorPosition(line: Int, col: Int) {
+    selectRange(line, col, line, col)
 }

@@ -10,7 +10,7 @@ import javafx.scene.input.KeyCode
 import javafx.scene.layout.Priority
 import javafx.stage.FileChooser
 import minic.frontend.validation.Error
-import miniceduapp.helpers.messageOrString
+import miniceduapp.helpers.*
 import miniceduapp.viewmodels.MainViewModel
 import miniceduapp.views.editor.*
 import miniceduapp.views.events.*
@@ -173,9 +173,14 @@ class MainView : View("Mini-C vizualization/simulation") {
                         }
                         column("Description", Error::message)
                         columnResizePolicy = SmartResize.POLICY
+                        placeholder = label("")
                         maxHeight = 100.0
+
+                        setOnRowDoubleClick { error ->
+                            codeArea.setCursorPosition(error.position.line - 1, error.position.column)
+                            codeArea.requestFocus()
+                        }
                     }
-                    removeWhen { booleanBinding(viewModel.errors) { isEmpty() } }
                 }
             }
         }
