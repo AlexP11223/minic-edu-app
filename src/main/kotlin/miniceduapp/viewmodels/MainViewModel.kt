@@ -15,7 +15,7 @@ import tornadofx.*
 import java.io.File
 import java.nio.file.Paths
 
-class MainViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
+class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
     val programCodeProperty = SimpleStringProperty("")
     var programCode: String by programCodeProperty
 
@@ -66,7 +66,7 @@ class MainViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
             validationTimerTask?.cancel()
 
             validationTimerTask = runLater(updateDelay) {
-                validateCode()
+                validateCodeAsync()
             }
         }
     }
@@ -83,7 +83,7 @@ class MainViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
     val loadSampleCodeCommand = command(this::loadSampleCode)
 
     val executeCodeCommand = command(this::executeCode,
-            enabled = isExecutingProgramProperty.not())
+            enabled = isExecutingProgramProperty.not().and(booleanBinding(errors) { isEmpty() }))
 
     val stopCodeExecutionCommand = command(this::stopCodeExecution,
             enabled = isExecutingProgramProperty)
@@ -92,6 +92,20 @@ class MainViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
             enabled = isExecutingProgramProperty)
 
     fun validateCode() {
+        validationTimerTask?.cancel()
+
+        try {
+            val newErrors = Compiler(programCode).validate()
+            if (errors != newErrors) {
+                errors.clear()
+                errors.addAll(newErrors)
+            }
+        } catch (ex: Throwable) {
+            fire(ErrorEvent(ex))
+        }
+    }
+
+    fun validateCodeAsync() {
         validationTimerTask?.cancel()
 
         val code = programCode // probably shouldn't access property from another thread
@@ -144,7 +158,7 @@ class MainViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
             _filePath = newFilePath
             _hasUnsavedCode = false
 
-            validateCode()
+            validateCodeAsync()
         } catch (ex: Throwable) {
             fire(ErrorEvent(ex, "Failed to open file '$newFilePath': ${ex.messageOrString()}."))
         }
@@ -169,10 +183,16 @@ print("x: " + toString(y));
     
     private fun executeCode() {
         _output = ""
-        _isExecutingProgram = true
 
         val simulatedFileName = if (filePath.isNullOrEmpty()) "program.mc" else Paths.get(filePath).fileName.toString()
         _output += "> minic $simulatedFileName\n"
+
+        validateCode()
+        if (errors.isNotEmpty()) {
+            return
+        }
+
+        _isExecutingProgram = true
 
         codeExecutor = CodeExecutor(programCode, onOutput = {
             _output += it

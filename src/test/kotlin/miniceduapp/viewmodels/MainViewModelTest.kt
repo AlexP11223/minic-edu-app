@@ -219,6 +219,24 @@ println("x = " + toString(x));
 
     @Test
     @TestInJfxThread
+    fun notExecutesWhenErrors() {
+        vm.programCode = """
+int x = undefVar;
+"""
+        assertTrue(vm.errors.isEmpty())
+        assertTrue(vm.executeCodeCommand.isEnabled)
+
+        vm.executeCodeCommand.execute()
+
+        assertFalse(vm.isExecutingProgram)
+        assertTrue(vm.errors.isNotEmpty())
+        assertFalse(vm.executeCodeCommand.isEnabled)
+        assertFalse(vm.stopCodeExecutionCommand.isEnabled)
+        assertFalse(vm.writeInputCommand.isEnabled)
+    }
+
+    @Test
+    @TestInJfxThread
     fun canExecuteProgramWithInput() {
         vm.programCode = """
 print("Enter: ");
@@ -259,6 +277,33 @@ println("Hello, " + name);
 
     @Test
     @TestInJfxThread
+    fun detectsErrorsAsync() {
+        assertTrue(vm.errors.isEmpty())
+
+        vm.programCode = "int x = y;"
+
+        vm.validateCodeAsync()
+
+        vm.validationTaskStatus.completed.awaitUntil()
+        assertTrue(vm.errors.isNotEmpty())
+
+        vm.programCode = "int x = 42;"
+
+        vm.validateCodeAsync()
+
+        vm.validationTaskStatus.completed.awaitUntil()
+        assertTrue(vm.errors.isEmpty())
+
+        vm.programCode = "int x = 42"
+
+        vm.validateCodeAsync()
+
+        vm.validationTaskStatus.completed.awaitUntil()
+        assertTrue(vm.errors.isNotEmpty())
+    }
+
+    @Test
+    @TestInJfxThread
     fun detectsErrors() {
         assertTrue(vm.errors.isEmpty())
 
@@ -266,21 +311,18 @@ println("Hello, " + name);
 
         vm.validateCode()
 
-        vm.validationTaskStatus.completed.awaitUntil()
         assertTrue(vm.errors.isNotEmpty())
 
         vm.programCode = "int x = 42;"
 
         vm.validateCode()
 
-        vm.validationTaskStatus.completed.awaitUntil()
         assertTrue(vm.errors.isEmpty())
 
         vm.programCode = "int x = 42"
 
         vm.validateCode()
 
-        vm.validationTaskStatus.completed.awaitUntil()
         assertTrue(vm.errors.isNotEmpty())
     }
 }
