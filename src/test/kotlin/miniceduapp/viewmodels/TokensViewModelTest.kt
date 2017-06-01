@@ -49,8 +49,8 @@ class TokensViewModelTest : BaseTornadoFxComponentTest() {
         val prevTokensCount = vm.tokens.size
 
         vm.mainViewModel.programCode = "int x = 42 + 1;"
-        vm.loadTokens()
 
+        vm.status.running.awaitUntil()
         vm.status.completed.awaitUntil()
 
         assertEquals(prevTokensCount + 2, vm.tokens.size)
