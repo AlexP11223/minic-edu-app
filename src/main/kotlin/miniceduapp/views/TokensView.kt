@@ -62,7 +62,7 @@ class TokensView : View("Lexer tokens") {
         }
 
         viewModel.selectedTokenProperty.onChange {
-            if (it != null && /* !EOF */ it.startIndex <= it.endIndex) {
+            if (it != null && it.startIndex < codeArea.text.length && /* !EOF */ it.startIndex <= it.endIndex) {
                 codeSelectionHighlighter.setRegions(IndexRange(it.startIndex, it.endIndex + 1))
                 outputSelectionHighlighter.setRegions(outputTokenPosition(it))
             } else {

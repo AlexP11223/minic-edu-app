@@ -49,8 +49,8 @@ class TokensViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
         runAsync(status) {
             Compiler(code).tokens
         } ui {
-            selectedToken = null
             _programCode = code
+            selectedToken = null
             tokens.clear()
             tokens.addAll(it)
         } fail {
