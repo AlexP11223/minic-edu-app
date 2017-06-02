@@ -98,18 +98,10 @@ class MainView : View("Mini-C vizualization/simulation") {
                     }
                 }
                 hbox {
-                    button("Tokens") {
-                        setOnAction {
-                            find<TokensView>().openWindow()
-                        }
-                    }
+                    button("Tokens").command = viewModel.openTokensWindow
                     arrowLabel()
                     vbox(5) {
-                        button("   AST   ") {
-                            setOnAction {
-                                find<AstView>().openWindow()
-                            }
-                        }
+                        button("   AST   ").command = viewModel.openAstWindow
                         button("Symbols") {
                         }
                     }
@@ -222,6 +214,9 @@ class MainView : View("Mini-C vizualization/simulation") {
         }
         subscribe<RequestFilePathEvent> {
             it.result = browseFile(FileChooserMode.Save, it.filters)
+        }
+        subscribe<OpenWindowEvent<View>> {
+            find(it.windowClass).openWindow()
         }
 
         viewModel.loadSampleCodeCommand.execute()

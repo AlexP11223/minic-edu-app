@@ -6,10 +6,9 @@ import minic.Compiler
 import minic.frontend.validation.Error
 import miniceduapp.CodeExecutor
 import miniceduapp.helpers.messageOrString
-import miniceduapp.views.events.ErrorEvent
-import miniceduapp.views.events.ErrorMessageEvent
-import miniceduapp.views.events.FileExtensionFilter
-import miniceduapp.views.events.RequestFilePathEvent
+import miniceduapp.views.AstView
+import miniceduapp.views.TokensView
+import miniceduapp.views.events.*
 import org.apache.commons.io.FilenameUtils
 import tornadofx.*
 import java.io.File
@@ -48,6 +47,11 @@ class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
     var input: String by inputProperty
 
     val errors = mutableListOf<Error>().observable()
+
+    private val _hasParsingErrorsProperty = ReadOnlyBooleanWrapper(false)
+    private var _hasParsingErrors by _hasParsingErrorsProperty
+    val hasParsingErrorsProperty: ReadOnlyBooleanProperty get() = _hasParsingErrorsProperty.readOnlyProperty
+    val hasParsingErrors: Boolean get() = _hasParsingErrorsProperty.value
 
     val validationTaskStatus = TaskStatus()
 
@@ -91,14 +95,24 @@ class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
     val writeInputCommand = command(this::writeInput,
             enabled = isExecutingProgramProperty)
 
+    val openTokensWindow = command {
+        fire(OpenWindowEvent(TokensView::class))
+    }
+
+    val openAstWindow = command(enabled = hasParsingErrorsProperty.not()) {
+        fire(OpenWindowEvent(AstView::class))
+    }
+
     fun validateCode() {
         validationTimerTask?.cancel()
 
         try {
-            val newErrors = Compiler(programCode).validate()
+            val compiler = Compiler(programCode);
+            val newErrors = compiler.validate()
             if (errors != newErrors) {
                 errors.clear()
                 errors.addAll(newErrors)
+                _hasParsingErrors = compiler.parsingResult.errors.any()
             }
         } catch (ex: Throwable) {
             fire(ErrorEvent(ex))
@@ -111,11 +125,14 @@ class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
         val code = programCode // probably shouldn't access property from another thread
 
         runAsync(validationTaskStatus) {
-            Compiler(code).validate()
+            val compiler = Compiler(code);
+            compiler.validate() to compiler.parsingResult.errors.any()
         } ui {
-            if (errors != it) {
+            val (newErrors, hasParsingErrors) = it
+            if (errors != newErrors) {
                 errors.clear()
-                errors.addAll(it)
+                errors.addAll(newErrors)
+                _hasParsingErrors = hasParsingErrors
             }
         } fail {
             fire(ErrorEvent(it))

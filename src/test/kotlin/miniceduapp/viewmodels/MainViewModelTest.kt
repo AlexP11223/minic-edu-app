@@ -233,6 +233,9 @@ int x = undefVar;
         assertFalse(vm.executeCodeCommand.isEnabled)
         assertFalse(vm.stopCodeExecutionCommand.isEnabled)
         assertFalse(vm.writeInputCommand.isEnabled)
+
+        assertTrue(vm.openTokensWindow.isEnabled)
+        assertTrue(vm.openAstWindow.isEnabled)
     }
 
     @Test
@@ -286,6 +289,8 @@ println("Hello, " + name);
 
         vm.validationTaskStatus.completed.awaitUntil()
         assertTrue(vm.errors.isNotEmpty())
+        assertFalse(vm.hasParsingErrors)
+        assertTrue(vm.openAstWindow.isEnabled)
 
         vm.programCode = "int x = 42;"
 
@@ -300,6 +305,8 @@ println("Hello, " + name);
 
         vm.validationTaskStatus.completed.awaitUntil()
         assertTrue(vm.errors.isNotEmpty())
+        assertTrue(vm.hasParsingErrors)
+        assertFalse(vm.openAstWindow.isEnabled)
     }
 
     @Test
@@ -312,6 +319,8 @@ println("Hello, " + name);
         vm.validateCode()
 
         assertTrue(vm.errors.isNotEmpty())
+        assertFalse(vm.hasParsingErrors)
+        assertTrue(vm.openAstWindow.isEnabled)
 
         vm.programCode = "int x = 42;"
 
@@ -324,5 +333,7 @@ println("Hello, " + name);
         vm.validateCode()
 
         assertTrue(vm.errors.isNotEmpty())
+        assertTrue(vm.hasParsingErrors)
+        assertFalse(vm.openAstWindow.isEnabled)
     }
 }
