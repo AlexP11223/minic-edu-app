@@ -7,6 +7,7 @@ import minic.frontend.validation.Error
 import miniceduapp.CodeExecutor
 import miniceduapp.helpers.messageOrString
 import miniceduapp.views.AstView
+import miniceduapp.views.BytecodeView
 import miniceduapp.views.TokensView
 import miniceduapp.views.events.*
 import org.apache.commons.io.FilenameUtils
@@ -101,6 +102,10 @@ class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
 
     val openAstWindow = command(enabled = hasParsingErrorsProperty.not()) {
         fire(OpenWindowEvent(AstView::class))
+    }
+
+    val openBytecodeWindow = command(enabled = booleanBinding(errors) { isEmpty() }) {
+        fire(OpenWindowEvent(BytecodeView::class))
     }
 
     fun validateCode() {

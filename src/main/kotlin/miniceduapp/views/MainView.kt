@@ -106,7 +106,7 @@ class MainView : View("Mini-C vizualization/simulation") {
                         }
                     }
                     arrowLabel()
-                    button("Bytecode")
+                    button("Bytecode").command = viewModel.openBytecodeWindow
                     arrowLabel()
                     vbox(5) {
                         button("Execute", imageview("run.png")) {
