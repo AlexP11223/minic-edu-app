@@ -4,18 +4,18 @@ import javafx.beans.property.*
 import javafx.util.Duration
 import minic.Compiler
 import minic.frontend.validation.Error
-import miniceduapp.CodeExecutor
 import miniceduapp.helpers.messageOrString
 import miniceduapp.views.AstView
 import miniceduapp.views.BytecodeView
+import miniceduapp.views.CodeExecutionView
 import miniceduapp.views.TokensView
 import miniceduapp.views.events.*
-import org.apache.commons.io.FilenameUtils
 import tornadofx.*
 import java.io.File
-import java.nio.file.Paths
 
 class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
+    val codeExecutionViewModel: CodeExecutionViewModel by inject()
+
     val programCodeProperty = SimpleStringProperty("")
     var programCode: String by programCodeProperty
 
@@ -29,23 +29,8 @@ class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
     val hasUnsavedCodeProperty: ReadOnlyBooleanProperty get() = _hasUnsavedCodeProperty.readOnlyProperty
     val hasUnsavedCode: Boolean get() = _hasUnsavedCodeProperty.value
 
-    private val _isExecutingProgramProperty = ReadOnlyBooleanWrapper(false)
-    private var _isExecutingProgram by _isExecutingProgramProperty
-    val isExecutingProgramProperty: ReadOnlyBooleanProperty get() = _isExecutingProgramProperty.readOnlyProperty
-    val isExecutingProgram: Boolean get() = _isExecutingProgramProperty.value
-
-    private val _hasInputOperationsProperty = ReadOnlyBooleanWrapper(false)
-    private var _hasInputOperations by _hasInputOperationsProperty
-    val hasInputOperationsProperty: ReadOnlyBooleanProperty get() = _hasInputOperationsProperty.readOnlyProperty
-    val hasInputOperations: Boolean get() = _hasInputOperationsProperty.value
-
-    private val _outputProperty = ReadOnlyStringWrapper("")
-    private var _output by _outputProperty
-    val outputProperty: ReadOnlyStringProperty get() = _outputProperty.readOnlyProperty
-    val output: String get() = _outputProperty.value
-
-    val inputProperty = SimpleStringProperty("")
-    var input: String by inputProperty
+    val isExecutingProgramProperty: ReadOnlyBooleanProperty get() = codeExecutionViewModel.isExecutingProgramProperty
+    val isExecutingProgram: Boolean get() = isExecutingProgramProperty.value
 
     val errors = mutableListOf<Error>().observable()
 
@@ -60,8 +45,6 @@ class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
             FileExtensionFilter("Mini-C source code", listOf("*.mc")),
             FileExtensionFilter("All files", listOf("*.*"))
     )
-
-    private var codeExecutor: CodeExecutor? = null
 
     private var validationTimerTask: FXTimerTask? = null
 
@@ -88,12 +71,9 @@ class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
     val loadSampleCodeCommand = command(this::loadSampleCode)
 
     val executeCodeCommand = command(this::executeCode,
-            enabled = isExecutingProgramProperty.not().and(booleanBinding(errors) { isEmpty() }))
+            enabled = codeExecutionViewModel.executeCodeCommand.enabled.and(booleanBinding(errors) { isEmpty() }))
 
     val stopCodeExecutionCommand = command(this::stopCodeExecution,
-            enabled = isExecutingProgramProperty)
-
-    val writeInputCommand = command(this::writeInput,
             enabled = isExecutingProgramProperty)
 
     val openTokensWindow = command {
@@ -112,7 +92,7 @@ class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
         validationTimerTask?.cancel()
 
         try {
-            val compiler = Compiler(programCode);
+            val compiler = Compiler(programCode)
             val newErrors = compiler.validate()
             if (errors != newErrors) {
                 errors.clear()
@@ -130,7 +110,7 @@ class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
         val code = programCode // probably shouldn't access property from another thread
 
         runAsync(validationTaskStatus) {
-            val compiler = Compiler(code);
+            val compiler = Compiler(code)
             compiler.validate() to compiler.parsingResult.errors.any()
         } ui {
             val (newErrors, hasParsingErrors) = it
@@ -204,40 +184,17 @@ print("x: " + toString(y));
     }
     
     private fun executeCode() {
-        _output = ""
-
-        val simulatedFileName = if (filePath.isNullOrEmpty()) "program.mc" else Paths.get(filePath).fileName.toString()
-        _output += "> minic $simulatedFileName\n"
-
         validateCode()
         if (errors.isNotEmpty()) {
             return
         }
 
-        _isExecutingProgram = true
+        codeExecutionViewModel.executeCodeCommand.execute(programCode)
 
-        codeExecutor = CodeExecutor(programCode, onOutput = {
-            _output += it
-        }, onFail = {
-            fire(ErrorEvent(it))
-        }, onFinish = {
-            _isExecutingProgram = false
-        }, onCompiled = {
-            _output += "> java ${FilenameUtils.getBaseName(simulatedFileName)}\n"
-        })
-        _hasInputOperations = codeExecutor!!.hasInputOperations
-
-        codeExecutor!!.start()
+        fire(OpenWindowEvent(CodeExecutionView::class))
     }
 
     private fun stopCodeExecution() {
-        codeExecutor?.stop()
-    }
-
-    private fun writeInput() {
-        val str = input.trim() + "\n"
-        _output += str
-        input = ""
-        codeExecutor?.writeInput(str)
+        codeExecutionViewModel.stopCodeExecutionCommand.execute()
     }
 }

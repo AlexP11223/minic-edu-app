@@ -2,11 +2,8 @@ package miniceduapp.views
 
 import javafx.application.Platform
 import javafx.event.EventTarget
-import javafx.geometry.Point2D
-import javafx.geometry.Pos
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
-import javafx.scene.input.KeyCode
 import javafx.scene.layout.Priority
 import javafx.stage.FileChooser
 import minic.frontend.validation.Error
@@ -24,11 +21,8 @@ class MainView : View("Mini-C vizualization/simulation") {
     val viewModel: MainViewModel by inject()
 
     var codeArea: CodeArea by singleAssign()
-    var outputArea: CodeArea by singleAssign()
 
     var initialDialogDir = "demo"
-
-    private var scrollingOutput = false // for autoscrolling to bottom via timer, doesn't work otherwise, not sure why
 
     override val root = borderpane {
         top {
@@ -122,38 +116,6 @@ class MainView : View("Mini-C vizualization/simulation") {
                         }
                     }
                 }
-                vbox(10) {
-                    vbox {
-                        label("Output")
-                        outputArea = codeEditor(paneOp = {
-                            minHeight = 140.0
-                            maxHeight = 140.0
-                        }) {
-                            addClass(Styles.outputArea)
-                            isEditable = false
-                            addSyntaxHighlighting(ProgramExecutionHighlighter())
-                        }
-                    }
-                    hbox(10) {
-                        label("Input") {
-                            style {
-                                alignment = Pos.CENTER_LEFT
-                            }
-                        }
-                        textfield(viewModel.inputProperty) {
-                            hgrow = Priority.ALWAYS
-                            setOnKeyPressed {
-                                if (it.code == KeyCode.ENTER) {
-                                    viewModel.writeInputCommand.execute()
-                                }
-                            }
-                        }
-                        button("Enter") {
-                            command = viewModel.writeInputCommand
-                        }
-                        removeWhen { viewModel.isExecutingProgramProperty.not().or(viewModel.hasInputOperationsProperty.not()) }
-                    }
-                }
                 vbox {
                     label("Errors")
                     tableview(viewModel.errors) {
@@ -187,24 +149,6 @@ class MainView : View("Mini-C vizualization/simulation") {
                 codeArea.replaceText(it)
             }
         }
-        viewModel.outputProperty.onChange {
-            outputArea.replaceText(it)
-
-            // autoscroll
-            if (!scrollingOutput) {
-                scrollingOutput = true
-                runLater(10.millis) {
-                    outputArea.scrollBy(Point2D(0.0, Double.MAX_VALUE))
-                    scrollingOutput = false
-                }
-            }
-        }
-
-        viewModel.isExecutingProgramProperty.onChange {
-            runLater(100.millis) {
-                outputArea.scrollBy(Point2D(0.0, Double.MAX_VALUE))
-            }
-        }
 
         subscribe<ErrorEvent> {
             alert(Alert.AlertType.ERROR, "Error", it.text ?: it.error.messageOrString(), ButtonType.OK)
@@ -216,7 +160,7 @@ class MainView : View("Mini-C vizualization/simulation") {
             it.result = browseFile(FileChooserMode.Save, it.filters)
         }
         subscribe<OpenWindowEvent<View>> {
-            find(it.windowClass).openWindow()
+            find(it.windowClass).openWindow(owner = currentWindow)
         }
 
         viewModel.loadSampleCodeCommand.execute()
