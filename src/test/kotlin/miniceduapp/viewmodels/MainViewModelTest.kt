@@ -1,7 +1,7 @@
 package miniceduapp.viewmodels
 
 import de.saxsys.mvvmfx.testingutils.jfxrunner.*
-import miniceduapp.BaseTornadoFxComponentTest
+import miniceduapp.testutils.BaseTornadoFxComponentTest
 import miniceduapp.views.events.ErrorMessageEvent
 import miniceduapp.views.events.RequestFilePathEvent
 import org.hamcrest.CoreMatchers.containsString

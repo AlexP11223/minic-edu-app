@@ -1,7 +1,7 @@
 package miniceduapp.viewmodels
 
 import de.saxsys.mvvmfx.testingutils.jfxrunner.*
-import miniceduapp.BaseTornadoFxComponentTest
+import miniceduapp.testutils.BaseTornadoFxComponentTest
 import org.junit.Test
 import org.junit.runner.RunWith
 import tornadofx.*
@@ -40,7 +40,7 @@ class TokensViewModelTest : BaseTornadoFxComponentTest() {
         assertEquals(0, vm.tokens.size)
 
         vm.mainViewModel.programCode = "int x = 42;"
-        vm.programCodeProperty.awaitUntil { it == vm.mainViewModel.programCode }
+        vm.programCodeProperty.awaitUntil { it == vm.mainViewModel.programCode } // otherwise this test sometimes fails on the next assert, not sure why
         vm.loadTokens()
 
         vm.status.completed.awaitUntil()

@@ -1,4 +1,4 @@
-package miniceduapp
+package miniceduapp.testutils
 
 import miniceduapp.views.events.ErrorEvent
 import miniceduapp.views.events.ErrorMessageEvent
