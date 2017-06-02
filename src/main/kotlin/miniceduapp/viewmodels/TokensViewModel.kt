@@ -1,5 +1,8 @@
 package miniceduapp.viewmodels
 
+import javafx.beans.property.ReadOnlyStringProperty
+import javafx.beans.property.ReadOnlyStringWrapper
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.util.Duration
 import minic.Compiler
@@ -12,10 +15,15 @@ class TokensViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
 
     val status = TaskStatus()
 
-    val programCodeProperty = SimpleStringProperty()
-    var programCode: String by programCodeProperty
+    private val _programCodeProperty = ReadOnlyStringWrapper("")
+    private var _programCode by _programCodeProperty
+    val programCodeProperty: ReadOnlyStringProperty get() = _programCodeProperty.readOnlyProperty
+    val programCode: String get() = _programCodeProperty.value
 
     val tokens = mutableListOf<Token>().observable()
+
+    val selectedTokenProperty = SimpleObjectProperty<Token>()
+    var selectedToken by selectedTokenProperty
 
     private var timerTask: FXTimerTask? = null
 
@@ -32,18 +40,27 @@ class TokensViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
     fun loadTokens() {
         timerTask?.cancel()
 
-        programCode = mainViewModel.programCode
-        tokens.clear()
+        val code = mainViewModel.programCode
 
-        val code = programCode // probably shouldn't access property from another thread
+        if (code == programCode) {
+            return
+        }
 
         runAsync(status) {
             Compiler(code).tokens
         } ui {
+            selectedToken = null
+            _programCode = code
             tokens.clear()
             tokens.addAll(it)
         } fail {
             fire(ErrorEvent(it))
+        }
+    }
+
+    fun setSelectedTokenFromCode(cursorPos: Int) {
+        selectedToken = tokens.firstOrNull {
+            cursorPos >= it.startIndex && cursorPos <= it.endIndex
         }
     }
 }
