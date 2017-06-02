@@ -1,4 +1,6 @@
 
+[![Build Status](https://travis-ci.org/AlexP11223/minic-edu-app.svg?branch=master)](https://travis-ci.org/AlexP11223/minic-edu-app)
+
 
 Very basic IDE and vizualization/simulation of Mini-C compiler (https://github.com/AlexP11223/minic).
 
