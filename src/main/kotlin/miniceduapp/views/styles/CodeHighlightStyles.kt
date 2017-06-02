@@ -59,7 +59,7 @@ class CodeHighlightStyles : Stylesheet(), HighlightStyle {
             fill = Color.TEAL
         }
         string {
-            fill = c("#A31515")
+            fill = Color.GREEN
         }
         comment {
             fill = c(128, 128, 128)
