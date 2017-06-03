@@ -21,5 +21,9 @@
             </includes>
             <outputDirectory>./demo</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/jfx/</directory>
+            <outputDirectory>.</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>
