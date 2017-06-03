@@ -39,8 +39,7 @@ class TokensViewModelTest : BaseTornadoFxComponentTest() {
     fun updatesTokens() {
         assertEquals(0, vm.tokens.size)
 
-        vm.mainViewModel.programCode = "int x = 42;"
-        vm.programCodeProperty.awaitUntil { it == vm.mainViewModel.programCode } // otherwise this test sometimes fails on the next assert, not sure why
+        vm.mainViewModel.programCode = "int x = 41;"
         vm.loadTokens()
 
         vm.status.completed.awaitUntil()
@@ -49,7 +48,7 @@ class TokensViewModelTest : BaseTornadoFxComponentTest() {
 
         val prevTokensCount = vm.tokens.size
 
-        vm.mainViewModel.programCode = "int x = 42 + 1;"
+        vm.mainViewModel.programCode = "int x = 41 + 1;"
 
         vm.status.running.awaitUntil()
         vm.status.completed.awaitUntil()

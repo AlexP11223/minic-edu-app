@@ -42,7 +42,7 @@ class TokensViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
 
         val code = mainViewModel.programCode
 
-        if (code == programCode) {
+        if (code == programCode || status.running.value) {
             return
         }
 
