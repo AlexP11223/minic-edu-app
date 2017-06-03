@@ -21,9 +21,5 @@
             </includes>
             <outputDirectory>./demo</outputDirectory>
         </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}/jfx/native/minic-edu-app</directory>
-            <outputDirectory>.</outputDirectory>
-        </fileSet>
     </fileSets>
 </assembly>
