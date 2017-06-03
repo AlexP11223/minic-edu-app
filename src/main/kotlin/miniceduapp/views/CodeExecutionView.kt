@@ -79,7 +79,7 @@ class CodeExecutionView : View("Execution") {
     }
 
     override fun onDock() {
-        setWindowMinSize(500, 200)
+        setWindowMinSize(550, 200)
 
         currentStage?.height = 300.0
     }
