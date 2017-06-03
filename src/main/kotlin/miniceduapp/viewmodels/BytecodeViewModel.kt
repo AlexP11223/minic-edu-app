@@ -5,8 +5,14 @@ import javafx.beans.property.ReadOnlyStringWrapper
 import javafx.beans.property.SimpleStringProperty
 import javafx.util.Duration
 import minic.Compiler
+import minic.CompilerConfiguration
+import miniceduapp.bytecodde.BytecodeTextParser
+import miniceduapp.bytecodde.Instruction
 import miniceduapp.views.events.ErrorEvent
+import org.stringtemplate.v4.compiler.Bytecode
 import tornadofx.*
+
+data class BytecodeLine(val line: Int, val instructions: List<Instruction>)
 
 class BytecodeViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
     val mainViewModel: MainViewModel by inject()
@@ -18,9 +24,7 @@ class BytecodeViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
     val programCodeProperty: ReadOnlyStringProperty get() = _programCodeProperty.readOnlyProperty
     val programCode: String get() = _programCodeProperty.value
 
-    val bytecodeTextProperty = SimpleStringProperty("")
-    var bytecodeText by bytecodeTextProperty
-
+    val bytecode = mutableListOf<BytecodeLine>().observable()
 
     private var timerTask: FXTimerTask? = null
 
@@ -37,17 +41,23 @@ class BytecodeViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
     fun loadBytecode() {
         timerTask?.cancel()
 
+        mainViewModel.validateCode()
+        if (mainViewModel.errors.any()) {
+            return
+        }
+
         val code = mainViewModel.programCode
 
-        if (code == programCode) {
+        if (code == programCode || status.running.value) {
             return
         }
 
         runAsync(status) {
-            Compiler(code).bytecodeText()
+            BytecodeTextParser(Compiler(code, CompilerConfiguration(debugInfo = true)).bytecodeText()).parse()
         } ui {
             _programCode = code
-            bytecodeText = it
+            bytecode.clear()
+            bytecode.addAll(it.groupBy { it.line!! }.map { BytecodeLine(it.key, it.value) })
 
         } fail {
             fire(ErrorEvent(it))
