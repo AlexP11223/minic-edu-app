@@ -23,5 +23,8 @@ Requirements:
 Run Maven **package** phase. This will download all dependencies, run JUnit tests and build JAR file + native application/bundle (such as .exe for Windows). Check Maven output to see if all tests and build steps are completed successfully.
 
 (Maven is included in popular Java IDEs such as IntelliJ Idea or Eclipse. You can run it either via your IDE Maven plugin or from command line in separate [Maven installation](https://maven.apache.org/install.html): `mvn package`.)
+
+`dist/` folder will contain JAR file and native bundles for the target OS, such as .exe for Windows, as well as sample source code files.
  
 Some of the tests (as well the application itself) launch `java`, using path from `System.getProperty("java.home")`. Fallbacks to `java` (from PATH environment variable) if it is not found.
+

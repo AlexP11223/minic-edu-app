@@ -164,6 +164,10 @@ class MainView : View("Mini-C vizualization/simulation") {
         }
 
         viewModel.loadSampleCodeCommand.execute()
+
+        if (!File(initialDialogDir).exists()) {
+            initialDialogDir = "../demo"
+        }
     }
 
     override fun onDock() {
