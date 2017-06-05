@@ -7,7 +7,7 @@ class MiniCSyntaxHighlighter : RegexSyntaxHighlighter(PATTERN, CodeHighlightStyl
 
     companion object {
         private val KEYWORDS = arrayOf("break", "continue", "while", "else", "if")
-        private val TYPES = arrayOf("boolean", "double", "int", "string")
+        private val TYPES = arrayOf("bool", "double", "int", "string")
 
         private val KEYWORD_PATTERN = "\\b(" + KEYWORDS.joinToString("|") + ")\\b"
         private val DATATYPE_PATTERN = "\\b(" + TYPES.joinToString("|") + ")\\b"
