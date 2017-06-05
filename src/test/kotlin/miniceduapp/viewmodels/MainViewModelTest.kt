@@ -45,6 +45,7 @@ class MainViewModelTest : BaseTornadoFxComponentTest() {
         assertTrue(vm.openTokensWindow.isEnabled)
         assertTrue(vm.openAstWindow.isEnabled)
         assertTrue(vm.openBytecodeWindow.isEnabled)
+        assertTrue(vm.openInteractiveExecutionWindow.isEnabled)
 
         assertTrue(vm.errors.isEmpty())
     }
@@ -248,6 +249,7 @@ int x = undefVar;
         assertFalse(vm.hasParsingErrors)
         assertTrue(vm.openAstWindow.isEnabled)
         assertFalse(vm.openBytecodeWindow.isEnabled)
+        assertFalse(vm.openInteractiveExecutionWindow.isEnabled)
 
         vm.programCode = "int x = 42;"
 
@@ -265,6 +267,7 @@ int x = undefVar;
         assertTrue(vm.hasParsingErrors)
         assertFalse(vm.openAstWindow.isEnabled)
         assertFalse(vm.openBytecodeWindow.isEnabled)
+        assertFalse(vm.openInteractiveExecutionWindow.isEnabled)
     }
 
     @Test
@@ -280,6 +283,7 @@ int x = undefVar;
         assertFalse(vm.hasParsingErrors)
         assertTrue(vm.openAstWindow.isEnabled)
         assertFalse(vm.openBytecodeWindow.isEnabled)
+        assertFalse(vm.openInteractiveExecutionWindow.isEnabled)
 
         vm.programCode = "int x = 42;"
 
@@ -295,5 +299,6 @@ int x = undefVar;
         assertTrue(vm.hasParsingErrors)
         assertFalse(vm.openAstWindow.isEnabled)
         assertFalse(vm.openBytecodeWindow.isEnabled)
+        assertFalse(vm.openInteractiveExecutionWindow.isEnabled)
     }
 }

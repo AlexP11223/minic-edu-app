@@ -5,10 +5,7 @@ import javafx.util.Duration
 import minic.Compiler
 import minic.frontend.validation.Error
 import miniceduapp.helpers.messageOrString
-import miniceduapp.views.AstView
-import miniceduapp.views.BytecodeView
-import miniceduapp.views.CodeExecutionView
-import miniceduapp.views.TokensView
+import miniceduapp.views.*
 import miniceduapp.views.events.*
 import tornadofx.*
 import java.io.File
@@ -86,6 +83,10 @@ class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
 
     val openBytecodeWindow = command(enabled = booleanBinding(errors) { isEmpty() }) {
         fire(OpenWindowEvent(BytecodeView::class))
+    }
+
+    val openInteractiveExecutionWindow = command(enabled = booleanBinding(errors) { isEmpty() }) {
+        fire(OpenWindowEvent(InteractiveExecutionView::class))
     }
 
     fun validateCode() {

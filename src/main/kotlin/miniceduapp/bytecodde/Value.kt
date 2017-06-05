@@ -48,3 +48,5 @@ class StringValue(value: String) : ObjectValue(value, "\"$value\"") {
 
     override fun toString() = "StringValue(value=$value)"
 }
+
+data class EmptyValue(override val text: String = "") : Value()

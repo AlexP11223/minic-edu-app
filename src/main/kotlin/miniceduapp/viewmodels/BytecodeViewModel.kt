@@ -36,6 +36,8 @@ class BytecodeViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
                 loadBytecode()
             }
         }
+
+        loadBytecode()
     }
 
     fun loadBytecode() {
