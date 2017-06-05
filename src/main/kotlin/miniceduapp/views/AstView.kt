@@ -63,6 +63,7 @@ class AstView : View("AST") {
                         img.scaleX = ratio
                         img.scaleY = ratio
                     }
+                    value = 100.0
                 }
                 label {
                     bind(zoomSlider.valueProperty(), format = DecimalFormat("#", DecimalFormatSymbols.getInstance(Locale.ENGLISH)))
