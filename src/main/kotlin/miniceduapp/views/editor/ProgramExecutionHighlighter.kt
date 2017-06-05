@@ -1,9 +1,9 @@
 package miniceduapp.views.editor
 
-import miniceduapp.views.styles.ProgramExecutionStyles
+import miniceduapp.views.styles.ProgramExecutionHighlightStyles
 import java.util.regex.Pattern
 
-class ProgramExecutionHighlighter : RegexSyntaxHighlighter(PATTERN, ProgramExecutionStyles()) {
+class ProgramExecutionHighlighter : RegexSyntaxHighlighter(PATTERN, ProgramExecutionHighlightStyles()) {
 
     companion object {
         private val COMMAND_PATTERN = "> .+?\n"

@@ -6,7 +6,8 @@ import miniceduapp.views.styles.*
 import tornadofx.*
 
 
-class MinicEduApp: App(MainView::class, Styles::class, CodeHighlightStyles::class, ProgramExecutionStyles::class, SelectionHighlightStyles::class)
+class MinicEduApp: App(MainView::class,
+        Styles::class, CodeHighlightStyles::class, ProgramExecutionHighlightStyles::class, SelectionHighlightStyles::class, BytecodeHighlightStyles::class)
 
 fun main(args: Array<String>) {
     importStylesheet("/richtextfx.css")

@@ -4,7 +4,7 @@ import javafx.scene.paint.Color
 import miniceduapp.views.editor.HighlightStyle
 import tornadofx.*
 
-class ProgramExecutionStyles : Stylesheet(), HighlightStyle {
+class ProgramExecutionHighlightStyles : Stylesheet(), HighlightStyle {
 
     companion object {
         val command by cssclass()
