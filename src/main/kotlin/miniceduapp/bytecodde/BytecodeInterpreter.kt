@@ -1,8 +1,5 @@
 package miniceduapp.bytecodde
 
-import javafx.beans.property.ReadOnlyBooleanProperty
-import javafx.beans.property.ReadOnlyBooleanWrapper
-import tornadofx.*
 import java.lang.StringBuilder
 import java.util.*
 
@@ -11,7 +8,7 @@ class BytecodeInterpreter(val bytecode: List<Instruction>,  val onOutput: (Strin
     private val _operandStack = ArrayDeque<Value>()
     private val _variables = mutableListOf<Value?>()
 
-    private var _currentInsruction = -1
+    private var _nextInsruction = 0
 
     private val _labelInstructionMap = bytecode.filter { it is Label }.map { (it as Label).id to bytecode.indexOf(it) }.toMap()
 
@@ -20,7 +17,7 @@ class BytecodeInterpreter(val bytecode: List<Instruction>,  val onOutput: (Strin
     val operandStack get() = _operandStack.toList()
     val variables get() = _variables.toList()
 
-    val currentInsruction get() = _currentInsruction
+    val nextInsruction get() = _nextInsruction
 
     val isExecuting: Boolean get() = _isExecuting
 
@@ -36,6 +33,8 @@ class BytecodeInterpreter(val bytecode: List<Instruction>,  val onOutput: (Strin
 
         _operandStack.clear()
 
+        _nextInsruction = 0
+
         _isExecuting = true
     }
 
@@ -46,9 +45,8 @@ class BytecodeInterpreter(val bytecode: List<Instruction>,  val onOutput: (Strin
     fun executeNextInstruction() {
         assert(isExecuting)
 
-        val instruction = bytecode[++_currentInsruction]
+        val instruction = bytecode[_nextInsruction++]
         instruction.execute()
-
     }
 
     fun execute() {
@@ -343,7 +341,7 @@ class BytecodeInterpreter(val bytecode: List<Instruction>,  val onOutput: (Strin
     }
 
     private fun jumpTo(label: Label) {
-        _currentInsruction = _labelInstructionMap[label.id]!!
+        _nextInsruction = _labelInstructionMap[label.id]!!
     }
 
     data class ClassMember(val className: String, val memberName: String)
