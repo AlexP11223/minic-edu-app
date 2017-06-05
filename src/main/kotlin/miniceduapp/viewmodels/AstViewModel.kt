@@ -11,7 +11,6 @@ import minic.Compiler
 import minic.backend.info.tree.NodeStyle
 import minic.backend.info.tree.TreePainter
 import minic.frontend.ast.AstNode
-import minic.frontend.ast.Position
 import minic.frontend.ast.Program
 import minic.frontend.ast.StatementsBlock
 import miniceduapp.views.events.ErrorEvent
@@ -30,7 +29,7 @@ class AstViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
     var ast: Program by astProperty
 
     val selectedAstNodeProperty = SimpleObjectProperty<AstNode>()
-    var selectedAstNode by selectedAstNodeProperty
+    var selectedAstNode: AstNode? by selectedAstNodeProperty
 
     private val _programCodeProperty = ReadOnlyStringWrapper("")
     private var _programCode by _programCodeProperty
@@ -74,18 +73,19 @@ class AstViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
             return
         }
 
-        runAsync(status) {
-            val compiler = Compiler(mainViewModel.programCode)
-            val painter = if (selectedAstNode != null && highlightSelectedNode) {
-                object : TreePainter {
-                    override fun paintNode(node: AstNode): NodeStyle {
-                        if (node == selectedAstNode) {
-                            return NodeStyle(fillColor = Color.yellow)
-                        }
-                        return super.paintNode(node)
+        val painter = if (selectedAstNode != null && highlightSelectedNode) {
+            object : TreePainter {
+                override fun paintNode(node: AstNode): NodeStyle {
+                    if (node == selectedAstNode) {
+                        return NodeStyle(fillColor = Color.yellow)
                     }
+                    return super.paintNode(node)
                 }
-            } else null
+            }
+        } else null
+
+        runAsync(status) {
+            val compiler = Compiler(code)
             SwingFXUtils.toFXImage(compiler.drawAst(painter), null) to compiler.ast
         } ui {
             astImage = it.first
@@ -99,16 +99,13 @@ class AstViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
     }
 
     fun setSelectedNodeFromCode(cursorLine: Int, cursorCol: Int) {
-        var found = false
         var node: AstNode? = null
         ast.process {
             if (it !is Program && it !is StatementsBlock) {
                 if (cursorLine == it.position!!.start.line && cursorCol >= it.position!!.start.column && cursorCol <= it.position!!.end.column) {
                     node = it
-                    found = true
                 }
             }
-            !found
         }
         selectedAstNode = node
     }

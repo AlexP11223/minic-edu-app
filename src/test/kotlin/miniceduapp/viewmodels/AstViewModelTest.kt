@@ -43,7 +43,7 @@ class AstViewModelTest : BaseTornadoFxComponentTest() {
 
         vm.setSelectedNodeFromCode(1, 8)
         assertNotNull(vm.selectedAstNode)
-        assertTrue(vm.selectedAstNode is IntLiteral, vm.selectedAstNode.javaClass.simpleName)
+        assertTrue(vm.selectedAstNode is IntLiteral, vm.selectedAstNode!!.javaClass.simpleName)
 
         vm.setSelectedNodeFromCode(2, 8)
         assertNull(vm.selectedAstNode)
