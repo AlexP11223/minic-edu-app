@@ -2,14 +2,21 @@ package miniceduapp.viewmodels
 
 import javafx.beans.property.ReadOnlyStringProperty
 import javafx.beans.property.ReadOnlyStringWrapper
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.embed.swing.SwingFXUtils
 import javafx.scene.image.Image
 import javafx.util.Duration
 import minic.Compiler
+import minic.backend.info.tree.NodeStyle
+import minic.backend.info.tree.TreePainter
+import minic.frontend.ast.AstNode
+import minic.frontend.ast.Position
 import minic.frontend.ast.Program
+import minic.frontend.ast.StatementsBlock
 import miniceduapp.views.events.ErrorEvent
 import tornadofx.*
+import java.awt.Color
 
 class AstViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
     val mainViewModel: MainViewModel by inject()
@@ -22,10 +29,16 @@ class AstViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
     val astProperty = SimpleObjectProperty<Program>()
     var ast: Program by astProperty
 
+    val selectedAstNodeProperty = SimpleObjectProperty<AstNode>()
+    var selectedAstNode by selectedAstNodeProperty
+
     private val _programCodeProperty = ReadOnlyStringWrapper("")
     private var _programCode by _programCodeProperty
     val programCodeProperty: ReadOnlyStringProperty get() = _programCodeProperty.readOnlyProperty
     val programCode: String get() = _programCodeProperty.value
+
+    val highlightSelectedNodeProperty = SimpleBooleanProperty(true)
+    var highlightSelectedNode by highlightSelectedNodeProperty
 
     private var timerTask: FXTimerTask? = null
 
@@ -36,6 +49,12 @@ class AstViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
             timerTask = runLater(updateDelay) {
                 loadAst()
             }
+        }
+        selectedAstNodeProperty.onChange {
+            loadAst()
+        }
+        highlightSelectedNodeProperty.onChange {
+            loadAst()
         }
 
         loadAst()
@@ -51,20 +70,47 @@ class AstViewModel(val updateDelay: Duration = 2.seconds) : ViewModel() {
 
         val code = mainViewModel.programCode
 
-        if (code == programCode || status.running.value) {
+        if (status.running.value) {
             return
         }
 
         runAsync(status) {
             val compiler = Compiler(mainViewModel.programCode)
-            SwingFXUtils.toFXImage(compiler.drawAst(), null) to compiler.ast
+            val painter = if (selectedAstNode != null && highlightSelectedNode) {
+                object : TreePainter {
+                    override fun paintNode(node: AstNode): NodeStyle {
+                        if (node == selectedAstNode) {
+                            return NodeStyle(fillColor = Color.yellow)
+                        }
+                        return super.paintNode(node)
+                    }
+                }
+            } else null
+            SwingFXUtils.toFXImage(compiler.drawAst(painter), null) to compiler.ast
         } ui {
-            _programCode = code
             astImage = it.first
             ast = it.second
+            if (_programCode != code) {
+                _programCode = code
+            }
         } fail {
             fire(ErrorEvent(it))
         }
+    }
+
+    fun setSelectedNodeFromCode(cursorLine: Int, cursorCol: Int) {
+        var found = false
+        var node: AstNode? = null
+        ast.process {
+            if (it !is Program && it !is StatementsBlock) {
+                if (cursorLine == it.position!!.start.line && cursorCol >= it.position!!.start.column && cursorCol <= it.position!!.end.column) {
+                    node = it
+                    found = true
+                }
+            }
+            !found
+        }
+        selectedAstNode = node
     }
 
 }

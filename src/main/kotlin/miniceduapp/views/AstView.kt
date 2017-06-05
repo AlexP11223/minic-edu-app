@@ -26,7 +26,7 @@ class AstView : View("AST") {
 
     override val root = hbox(15) {
         addClass(Styles.windowContent)
-        vbox {
+        vbox(10) {
             hgrow = Priority.ALWAYS
             maxWidth = 500.0
             codeArea = codeEditor(paneOp = {
@@ -36,9 +36,10 @@ class AstView : View("AST") {
                 addSyntaxHighlighting(MiniCSyntaxHighlighter())
                 //showLineNumbers() // weird bug, onDock doesn't fire if called here
                 selectionProperty().onChange {
-                    println(it)
+                    viewModel.setSelectedNodeFromCode(currentParagraph + 1, caretColumn)
                 }
             }
+            checkbox("Highlight node selected in code", viewModel.highlightSelectedNodeProperty)
         }
         vbox {
             hgrow = Priority.ALWAYS
