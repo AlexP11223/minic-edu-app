@@ -77,6 +77,10 @@ class MainViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
         fire(OpenWindowEvent(TokensView::class))
     }
 
+    val openSymbolsWindow = command(enabled = hasParsingErrorsProperty.not()) {
+        fire(OpenWindowEvent(SymbolsView::class))
+    }
+
     val openAstWindow = command(enabled = hasParsingErrorsProperty.not()) {
         fire(OpenWindowEvent(AstView::class))
     }

@@ -2,6 +2,7 @@ package miniceduapp.views
 
 import javafx.application.Platform
 import javafx.event.EventTarget
+import javafx.geometry.Pos
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
 import javafx.scene.layout.Priority
@@ -96,8 +97,7 @@ class MainView : View("Mini-C vizualization/simulation") {
                     arrowLabel()
                     vbox(5) {
                         button("   AST   ").command = viewModel.openAstWindow
-                        button("Symbols") {
-                        }
+                        button("Symbols").command = viewModel.openSymbolsWindow
                     }
                     arrowLabel()
                     button("Bytecode").command = viewModel.openBytecodeWindow
@@ -114,6 +114,11 @@ class MainView : View("Mini-C vizualization/simulation") {
                             command = viewModel.stopCodeExecutionCommand
                             visibleWhen { viewModel.isExecutingProgramProperty }
                         }
+                    }
+                }
+                borderpane {
+                    right {
+                        button("Interactive Bytecode Execution").command = viewModel.openInteractiveExecutionWindow
                     }
                 }
                 vbox {
