@@ -28,7 +28,7 @@ int y = x;
 """.trim()
         vm.loadBytecode()
 
-        booleanBinding(vm.bytecode) { isNotEmpty() }.awaitUntil()
+        booleanBinding(vm.bytecode) { size > 10 }.awaitUntil()
 
         assertNotEquals(0, vm.bytecode.size)
 
@@ -69,7 +69,7 @@ int y = x;
 
         vm.goToNextLineCommand.execute()
 
-        assertTrue(vm.nextInstructionIndex > 10)
+        assertTrue(vm.nextInstructionIndex > 10, vm.nextInstructionIndex.toString())
         assertEquals(2, vm.nextLine)
         assertEquals(100, vm.variables.size)
         assertEquals(100, vm.operandStackValues.size)
