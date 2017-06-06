@@ -4,15 +4,21 @@
 
 Very basic IDE and vizualization/simulation of Mini-C compiler (https://github.com/AlexP11223/minic).
 
-Allows to see output for each compilation phase, such as tokens, AST image, generated JVM bytecode.
+Allows to see output for each compilation phase, such as tokens, AST image, generated JVM bytecode and to execute bytecode step-by-step simulating JVM operand stack and variables changes.
 
 Implemented in Kotlin, using JavaFX ([TornadoFX](https://github.com/edvin/tornadofx)) for GUI, [RichTextFX](https://github.com/TomasMikula/RichTextFX) text editor.
 
-![](http://i.imgur.com/qbdGc8G.png)
+![](http://i.imgur.com/JH78kBw.png)
 
-![](http://i.imgur.com/aVnoQXE.png)
+![](http://i.imgur.com/XCCLbFH.png)
 
-![](http://i.imgur.com/0Qcr0FV.png)
+![](http://i.imgur.com/57O4khA.png)
+
+![](http://i.imgur.com/LGi5RWx.png)
+
+![](http://i.imgur.com/WS6hgoQ.png)
+
+![](http://i.imgur.com/RcyQyRq.png)
   
 # How to build
 
