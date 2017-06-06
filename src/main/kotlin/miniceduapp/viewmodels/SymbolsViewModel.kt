@@ -3,21 +3,16 @@ package miniceduapp.viewmodels
 import javafx.beans.property.ReadOnlyStringProperty
 import javafx.beans.property.ReadOnlyStringWrapper
 import javafx.beans.property.SimpleObjectProperty
-import javafx.embed.swing.SwingFXUtils
 import javafx.util.Duration
 import minic.Compiler
-import minic.backend.info.tree.NodeStyle
-import minic.backend.info.tree.TreePainter
 import minic.frontend.ast.AstNode
 import minic.frontend.ast.Program
 import minic.frontend.ast.StatementsBlock
-import minic.frontend.lexer.Token
 import minic.frontend.scope.Scope
 import minic.frontend.scope.Symbol
 import minic.frontend.scope.processWithSymbols
 import miniceduapp.views.events.ErrorEvent
 import tornadofx.*
-import java.awt.Color
 
 class SymbolsViewModel(val updateDelay: Duration = 1.seconds) : ViewModel() {
     val mainViewModel: MainViewModel by inject()

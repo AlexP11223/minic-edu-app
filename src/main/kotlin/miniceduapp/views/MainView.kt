@@ -2,7 +2,6 @@ package miniceduapp.views
 
 import javafx.application.Platform
 import javafx.event.EventTarget
-import javafx.geometry.Pos
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
 import javafx.scene.layout.Priority

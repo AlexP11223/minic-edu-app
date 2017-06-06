@@ -3,7 +3,6 @@ package miniceduapp.viewmodels
 import javafx.beans.property.ReadOnlyStringProperty
 import javafx.beans.property.ReadOnlyStringWrapper
 import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
 import javafx.util.Duration
 import minic.Compiler
 import minic.frontend.lexer.Token

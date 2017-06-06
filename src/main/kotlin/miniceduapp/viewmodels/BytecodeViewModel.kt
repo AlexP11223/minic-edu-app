@@ -2,14 +2,12 @@ package miniceduapp.viewmodels
 
 import javafx.beans.property.ReadOnlyStringProperty
 import javafx.beans.property.ReadOnlyStringWrapper
-import javafx.beans.property.SimpleStringProperty
 import javafx.util.Duration
 import minic.Compiler
 import minic.CompilerConfiguration
 import miniceduapp.bytecodde.BytecodeTextParser
 import miniceduapp.bytecodde.Instruction
 import miniceduapp.views.events.ErrorEvent
-import org.stringtemplate.v4.compiler.Bytecode
 import tornadofx.*
 
 data class BytecodeLine(val line: Int, val instructions: List<Instruction>)
