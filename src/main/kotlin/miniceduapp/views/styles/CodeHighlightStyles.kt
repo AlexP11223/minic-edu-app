@@ -11,6 +11,7 @@ class CodeHighlightStyles : Stylesheet(), HighlightStyle {
         val keyword by cssclass()
         val datatype by cssclass()
         val number by cssclass()
+        val boolvalue by cssclass()
         val semicolon by cssclass()
         val paren by cssclass()
         val bracket by cssclass()
@@ -24,6 +25,7 @@ class CodeHighlightStyles : Stylesheet(), HighlightStyle {
                 keyword.name,
                 datatype.name,
                 number.name,
+                boolvalue.name,
                 semicolon.name,
                 paren.name,
                 bracket.name,
@@ -42,6 +44,9 @@ class CodeHighlightStyles : Stylesheet(), HighlightStyle {
             fill = Color.BLUE
         }
         number {
+            fill = Color.BLUE
+        }
+        boolvalue {
             fill = Color.BLUE
         }
         semicolon {
